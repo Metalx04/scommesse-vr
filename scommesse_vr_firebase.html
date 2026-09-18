@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scommesse Victory Road</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#13235B; --navy-2:#22378A; --bolt:#FFD21F; --paper:#F6F7FB; --card:#FFFFFF;
+  --ink:#18203A; --muted:#5B6480; --line:#DCE1EC; --red:#D93A25; --green:#1E7A3C;
+  --t1:#7CC8EC; --t2:#5DBE74; --t3:#F5C400; --t4:#FF8A1F; --t5:#E2622A; --t6:#D93A25;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Barlow",system-ui,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;margin:0;line-height:1.08}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--bolt);outline-offset:2px}
+
+.band{background:var(--navy);color:#fff;padding:22px 18px 0;position:relative;overflow:hidden}
+.band-inner{max-width:860px;margin:0 auto;position:relative;z-index:1}
+.bolt-shape{position:absolute;right:-36px;top:-24px;width:200px;height:230px;z-index:0}
+h1{font-size:clamp(2.2rem,8vw,3.6rem);font-weight:800;font-style:italic;max-width:12ch}
+.who{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 16px;color:#C9D3F2;font-size:.95rem}
+.who b{color:#fff}
+.linkbtn{background:none;border:0;color:var(--bolt);text-decoration:underline;cursor:pointer;padding:0}
+.tabs{display:flex;gap:2px;max-width:860px;margin:0 auto;overflow-x:auto;position:relative;z-index:2}
+.tabs button{background:transparent;border:0;color:#C9D3F2;padding:10px 14px 12px;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-size:1.1rem;font-weight:700;border-radius:8px 8px 0 0;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--paper);color:var(--navy)}
+
+main{max-width:860px;margin:0 auto;padding:20px 18px 70px}
+h2{font-size:1.75rem;font-weight:700;color:var(--navy);margin:26px 0 10px}
+h2:first-child{margin-top:2px}
+h3{font-size:1.3rem;color:var(--navy)}
+.lead{color:var(--muted);max-width:66ch;margin:0 0 12px}
+.banner{background:#FFF6CC;border:1px solid #EAD27A;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.92rem}
+
+.gauge{display:inline-flex;align-items:flex-end;gap:3px;flex:none}
+.gauge i{display:block;width:7px;background:rgba(128,140,175,.28);transform:skewX(-18deg);border-radius:1px}
+.gauge i:nth-child(1){height:7px}.gauge i:nth-child(2){height:10px}.gauge i:nth-child(3){height:13px}
+.gauge i:nth-child(4){height:16px}.gauge i:nth-child(5){height:19px}.gauge i:nth-child(6){height:22px}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px}
+.list{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.row{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .name{font-weight:600}
+.row .how,.meta{color:var(--muted);font-size:.88rem}
+.prize{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.02rem;white-space:nowrap}
+.tag{display:inline-block;background:var(--navy);color:#fff;border-radius:4px;padding:0 6px;font-size:.8rem;font-weight:600;margin-left:4px;vertical-align:1px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:block;font-size:.85rem;color:var(--muted);font-weight:500}
+label select,label input,.pick select,.pick input{display:block;width:100%;margin-top:4px;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:6px;padding:10px 16px;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--line)}
+.btn.bolt{background:var(--bolt);color:var(--navy)}
+.btn.small{padding:6px 10px;font-size:.85rem}
+.btn[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.msg{font-size:.9rem;color:var(--red)}
+.ok{color:var(--green)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.card .title{font-family:"Barlow Condensed",sans-serif;font-size:1.35rem;font-weight:700;color:var(--navy)}
+.pill{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.8rem;font-weight:600;background:#EEF1F8;color:var(--navy)}
+.pill.you{background:var(--bolt)}
+
+.status{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.status div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.status b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:1.2rem}
+.sealed{letter-spacing:.2em;color:var(--muted)}
+
+.betpick{padding:14px 16px;border-top:1px solid var(--line)}
+.betpick:first-child{border-top:0}
+.betpick .head{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.picks div{background:#F3F5FA;border-radius:6px;padding:8px 10px}
+.picks small{display:block;color:var(--muted)}
+.picks strong{font-size:1.05rem}
+.outcome{display:flex;gap:6px;flex-wrap:wrap}
+
+.nmbet{display:grid;grid-template-columns:auto 48px 1fr;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid var(--line)}
+.nmbet:first-child{border-top:0}
+.nmbet input[type=checkbox]{width:18px;height:18px}
+.nmbet .subj{grid-column:3;margin-top:4px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;width:100%}
+
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-top:1px solid var(--line);font-size:.95rem}
+th{background:#EEF1F8;font-weight:600;border-top:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.pos{color:var(--green);font-weight:600}.neg{color:var(--red);font-weight:600}
+.paid .name{text-decoration:line-through;color:var(--muted)}
+.empty{padding:16px;color:var(--muted)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted)}
+.toggle input{width:auto;margin:0}
+.rules ol{margin:0;padding-left:1.2rem}.rules li{margin:.3rem 0}
+.rules{border-left:5px solid var(--red)}
+.lobbyhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--bolt);border-radius:8px;padding:14px 16px}
+.bigcode{font-family:"Barlow Condensed",sans-serif;font-size:3rem;font-weight:800;letter-spacing:.14em;color:var(--navy);line-height:1}
+.code{font-family:"Barlow Condensed",sans-serif;letter-spacing:.12em;background:var(--bolt);padding:0 6px;border-radius:4px;color:var(--navy)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#B9C0D3;margin-right:5px;vertical-align:1px}
+.dot.on{background:#2BB24C}
+.person{margin-right:12px;white-space:nowrap}
+.status b .person{margin:0}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.slot{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.slot b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:1.2rem;margin-top:2px}
+.slot b .person{margin:0}
+.tapped{opacity:.55;transform:scale(.98)}
+.btn{transition:opacity .12s, transform .12s}
+.combo{border-left:4px solid var(--bolt);padding-left:12px;margin-top:10px}
+.prizebox{background:#F3F5FA;border-radius:6px;padding:10px 12px;margin-top:14px}
+.prizebox b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:1.3rem;color:var(--navy)}
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.quotes div{background:#F3F5FA;border-radius:6px;padding:8px 10px}
+.quotes b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:1.05rem;line-height:1.15;color:var(--navy)}
+.lobbytitle{font-family:"Barlow Condensed",sans-serif;font-size:1.45rem;font-weight:700;color:var(--navy)}
+.intro{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--bolt);border-radius:8px;padding:18px 20px}
+.introl{margin:6px 0 14px;padding-left:1.2rem;color:var(--muted);max-width:66ch}
+.introl li{margin:.35rem 0}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+#toast.show{opacity:1}
+
+@media (max-width:600px){
+  .bolt-shape{width:110px;height:130px;right:-20px;top:-10px}
+  .tabs button{padding:9px 9px 11px;font-size:1rem}
+  .row{grid-template-columns:40px 1fr}
+  .row .prize,.row .end{grid-column:2}
+  .picks,.status{grid-template-columns:1fr}
+  .quotes{grid-template-columns:1fr}
+  .slots{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="band">
+  <svg class="bolt-shape" viewBox="0 0 230 260" aria-hidden="true"><polygon points="140,0 60,140 115,140 70,260 200,100 140,100 190,0" fill="#FFD21F"/></svg>
+  <div class="band-inner">
+    <h1>Scommesse Victory Road</h1>
+    <div class="who" id="who"></div>
+  </div>
+  <nav class="tabs" id="tabs" role="tablist" hidden>
+    <button role="tab" data-view="partite">Partite</button>
+    <button role="tab" data-view="debiti">Chi deve cosa</button>
+    <button role="tab" data-view="storico">Storico</button>
+    <button role="tab" data-view="scheda">Scheda</button>
+  </nav>
+</header>
+<main id="app"><p class="lead">Caricamento…</p></main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ================= Dati fissi ================= */
+const TIERS = {1:'Acqua / caffè',2:'Bibita / amaro / shot',3:'Birra / toast',4:'Panino semplice',5:'Panino / piadina / drink',6:'Menù / drink costoso'};
+const MAXT = 6;
+const DEFAULT_PLAYERS = ['Luca','Mario','Gianlu','Simo','Berro'];
+const fl = v => String(v).replace('.',',');
+
+const FIRST_SLOT = ['Luca','Gianlu','Mario','Simo'];
+const SECOND_SLOT = ['Gianlu','Mario','Simo','Berro'];
+// Quote 1X2 per coppia: livelli di premio per 1, X e 2
+const QUOTE = [
+  {a:'Luca',b:'Simo',t:[1,3,5]},
+  {a:'Luca',b:'Mario',t:[2,3,5]},
+  {a:'Luca',b:'Gianlu',t:[2,3,5]},
+  {a:'Luca',b:'Berro',t:[1,5,6]},
+  {a:'Mario',b:'Gianlu',t:[3,2,2]},
+  {a:'Mario',b:'Berro',t:[1,5,6]},
+  {a:'Mario',b:'Simo',t:[2,2,3]},
+  {a:'Gianlu',b:'Simo',t:[2,3,5]},
+  {a:'Gianlu',b:'Berro',t:[1,5,6]},
+  {a:'Simo',b:'Berro',t:[1,5,6]}
+];
+function quoteFor(p1, p2){
+  if(!p1 || !p2) return null;
+  const d = QUOTE.find(q => q.a === p1 && q.b === p2);
+  if(d) return d.t;
+  const r = QUOTE.find(q => q.a === p2 && q.b === p1);
+  return r ? [r.t[2], r.t[1], r.t[0]] : null;
+}
+const quoteOptions = m => {
+  const t = quoteFor(m.p1, m.p2);
+  return t ? [[`1 — ${m.p1}`, t[0]], ['X — pareggio', t[1]], [`2 — ${m.p2}`, t[2]]] : [];
+};
+const quoteTier = (m, pick) => {
+  const o = quoteOptions(m).find(x => x[0] === pick);
+  return o ? o[1] : null;
+};
+
+function catalog(m){
+  return [
+    {cat:'Esito', items:[
+      {cid:'esito12',t:null,k:'quote',needPair:true,name:'Esito 1X2 della sfida',how:'Il premio dipende dalla coppia che gioca: le quote sono nella scheda.'},
+      {cid:'scarto2',t:2,k:'pn',name:'Vittoria con esattamente 2 gol di scarto',how:'Due di scarto preciso: con tre o più non vale.'},
+      {cid:'scarto',t:4,k:'pn',name:'Vittoria con 3 o più gol di scarto',how:'Scegli chi dilaga, oppure nessuno.'},
+      {cid:'rimonta',t:5,k:'yes',name:'Rimonta',how:'Chi è sotto a fine 1° tempo vince la partita.'},
+      {cid:'esatto',t:5,k:'score',name:'Risultato esatto',how:'Punteggio finale preciso.'},
+      {cid:'esattopm',t:6,k:'text',ph:'Es. 3-2, Axel Blaze',name:'Risultato esatto + primo marcatore',how:'Il colpo grosso della serata.'}
+    ]},
+    {cat:'Gol', items:[
+      {cid:'primo',t:1,k:'pn',name:'Chi segna per primo',how:'Sullo 0-0 vince chi ha scelto “Nessuno”.'},
+      {cid:'tempo',t:1,k:'tempo',name:'Tempo con più gol',how:'Se i due tempi finiscono con lo stesso numero di gol non vince nessuno.'},
+      {cid:'ouht',t:2,k:'ou',name:'Under/Over 1,5 gol nel 1° tempo',how:'Gol totali nel primo tempo.'},
+      {cid:'ou2t',t:2,k:'ou',name:'Under/Over 1,5 gol nel 2° tempo',how:'Gol totali nel secondo tempo.'},
+      {cid:'over35',t:3,k:'yes',name:'Over 3,5 gol totali',how:'Almeno 4 gol tra i due.'},
+      {cid:'goltot',t:3,k:'num',name:'Numero esatto di gol totali',how:'Somma dei gol dei due giocatori.'},
+      {cid:'nogoal',t:4,k:'yes',name:'No goal: almeno uno non segna',how:'Uno dei due chiude senza gol.'},
+      {cid:'gol15',t:4,k:'yes',name:'Gol nei primi 15 minuti',how:'Almeno un gol, di chiunque, nel quarto d\'ora iniziale.'},
+      {cid:'gol10',t:5,k:'yes',name:'Gol nei primi 10 minuti',how:'Almeno un gol, di chiunque, nei primi dieci minuti.'},
+      {cid:'nogol1t',t:5,k:'yes',name:'Nessun gol nel primo tempo',how:'Si va al riposo sullo 0-0.'}
+    ]},
+    {cat:'Marcatori', items:[
+      {cid:'mfw',t:2,k:'yes',subj:'Attaccante',name:'Segna l\'attaccante',how:'Scrivi il nome quando scegli la scommessa.'},
+      {cid:'mmf',t:3,k:'yes',subj:'Centrocampista',name:'Segna il centrocampista',how:'Scrivi il nome quando scegli la scommessa.'},
+      {cid:'pmfw',t:4,k:'text',ph:'Nome dell\'attaccante',name:'Primo marcatore (attaccante)',how:'Scrivi l\'attaccante che segna il primo gol.'},
+      {cid:'dopp',t:4,k:'yes',subj:'Attaccante',name:'Doppietta dell\'attaccante',how:'Almeno due gol dello stesso attaccante.'},
+      {cid:'lungo',t:5,k:'yes',name:'Gol da tiro lungo',how:'Almeno un gol da tiro dalla distanza, di chiunque.'},
+      {cid:'pmalt',t:5,k:'text',ph:'Nome del giocatore',name:'Primo marcatore (non attaccante)',how:'Centrocampista o difensore che sblocca la partita.'}
+    ]},
+    {cat:'Eventi di gioco', items:[
+      {cid:'oufalli',t:1,k:'ou',name:'Under/Over 1,5 falli totali',how:'Falli fischiati a entrambi.'},
+      {cid:'scontri12',t:1,k:'yes',name:'1 o 2 scontri mirati vinti',how:'In tutta la partita se ne vincono uno o due.'},
+      {cid:'undersenza',t:1,k:'yes',name:'Under 3,5 tiri senza tecnica',how:'Al massimo tre tiri normali in tutta la partita.'},
+      {cid:'underport',t:1,k:'yes',name:'Under 1,5 tiri/parate portentose',how:'Al massimo una in tutta la partita.'},
+      {cid:'outiri',t:2,k:'ou',name:'Under/Over 7,5 tiri totali',how:'Tutti i tiri di entrambi, con o senza tecnica.'},
+      {cid:'oufuori',t:2,k:'ou',name:'Under/Over 1,5 fuorigioco',how:'Fuorigioco fischiati a entrambi.'},
+      {cid:'oversenza',t:3,k:'yes',name:'Over 3,5 tiri senza tecnica',how:'Almeno quattro tiri normali in tutta la partita.'},
+      {cid:'overport',t:3,k:'yes',name:'Over 1,5 tiri/parate portentose',how:'Almeno due in tutta la partita.'},
+      {cid:'giallo',t:5,k:'yes',name:'Almeno un cartellino giallo',how:'Si può puntare solo sul sì.'},
+      {cid:'scontriex',t:5,k:'num',name:'Numero esatto di scontri mirati vinti',how:'Quanti ne vengono vinti in tutta la partita.'},
+      {cid:'autogol',t:6,k:'yes',name:'Almeno un autogol',how:'Si può puntare solo sul sì.'}
+    ]},
+    {cat:'Speciali Victory Road', items:[
+      {cid:'trasf',t:1,k:'pn',name:'Chi attiva per primo una trasformazione',how:'Keshin, Totem, Armatura, Risveglio.'},
+      {cid:'golrisveglio',t:2,k:'yes',name:'Gol segnato con un risveglio',how:'Almeno un gol con un risveglio attivo.'},
+      {cid:'golhyper',t:2,k:'yes',name:'Gol segnato con una Hyper Move',how:'Almeno un gol con una mossa da trasformazione.'}
+    ]}
+  ];
+}
+
+// Somma di due scommesse: i livelli si sommano e si fermano al menù.
+// Due caffè restano due caffè, e caffè più panino resta panino e caffè.
+function comboPrize(t1, t2){
+  const [a, b] = [t1, t2].sort((x, y) => x - y);
+  if(a === 1 && b === 1) return [1, 1];
+  if(a === 1 && b === 5) return [5, 1];
+  return [Math.min(6, a + b)];
+}
+const prizeText = r => (r.prize || [r.t]).map(t => TIERS[t]).join(' + ');
+const prizePoints = r => (r.prize || [r.t]).reduce((s, t) => s + t, 0);
+// Le scommesse vecchie avevano un solo campo: le riporto alla forma nuova
+function normRec(r){
+  if(!r) return null;
+  if(r.bets) return r;
+  return {...r, bets:[{cid:r.cid, label:r.label, t:r.t, k:r.k, pick:r.pick, note:r.note || ''}], prize:[r.t]};
+}
+const recLabel = r => normRec(r).bets.map(b => b.label).join('  +  ');
+const recPick = r => normRec(r).bets.map(b => b.pick + (b.note ? ` — ${b.note}` : '')).join('  +  ');
+const recCids = r => normRec(r).bets.map(b => b.cid).filter(Boolean);
+
+const RULES = [
+  'Un solo link per sempre. Uno dei due che scommettono crea la lobby e sceglie una password da passare all\'altro: senza password non si entra.',
+  'Nella lobby ci sono due posti, uno per scommettitore. Chi gioca la partita non deve entrare nell\'app: l\'admin può scriverne i nomi come etichetta.',
+  'Ogni scommettitore fa una sola giocata: una scommessa singola oppure una combo di due. Resta sigillata finché non hanno confermato entrambi.',
+  'Nella combo devono essere giuste tutte e due e i premi si sommano: caffè più bibita fa birra, due bibite un panino semplice, bibita più birra un panino, due birre un menù. Qualsiasi cosa sommata a un panino fa menù. Due caffè restano due caffè, e caffè più panino è panino e caffè.',
+  'Chi indovina riceve dall\'altro scommettitore il premio della propria scommessa. Possono vincere entrambi.',
+  'Alcune scommesse hanno un solo lato possibile, per esempio No goal, rimonta, cartellino giallo e autogol: si punta solo sul sì.',
+  'Nel “tempo con più gol” non vince nessuno se i due tempi finiscono con lo stesso numero di gol.',
+  'A fine partita l\'admin segna quali scommesse sono state indovinate e chiude la partita: finisce nello storico e i premi in “Chi deve cosa”.',
+  'Conta il risultato a fine tempi regolamentari.',
+  'Una scommessa vinta non si può ripetere nella stessa serata, ma solo per chi l\'ha vinta: l\'app gliela segna come “già vinta”. Se l\'hai sbagliata puoi riprovarla, e l\'altro può sceglierla lo stesso.',
+  'L\'esito 1X2 ha quote diverse per ogni coppia di giocatori: le trovi nella tabella qui sotto.',
+  'Il vincitore può sempre chiedere un analcolico dello stesso livello.'
+];
+
+function optionsFor(bet, m){
+  switch(bet.k){
+    case 'quote': return quoteOptions(m).map(o => o[0]);
+    case 'ou': return ['Under','Over'];
+    case 'yn': return ['Sì','No'];
+    case 'yes': return ['Sì','Passo'];
+    case 'gg': return ['Goal','No goal'];
+    case 'tempo': return ['1° tempo','2° tempo'];
+    case 'pn': return [m.p1, m.p2, 'Nessuno'];
+    case 'combo': {
+      const r = [];
+      for(const e of [`Vince ${m.p1}`,'Pareggio',`Vince ${m.p2}`]) for(const u of ['Under','Over']) r.push(`${e} + ${u}`);
+      return r;
+    }
+    default: return null;
+  }
+}
+
+/* ================= Utilità ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = n => n.replace(/[^A-Za-z0-9]/g,'_');
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const today = () => new Date().toISOString().slice(0,10);
+const fmtDate = d => { if(!d) return ''; const [y,m,g] = d.split('-'); return `${g}/${m}/${y.slice(2)}`; };
+function gauge(t){ let h = `<span class="gauge" aria-label="Livello ${t} su ${MAXT}">`; for(let i=1;i<=MAXT;i++) h += `<i style="${i<=t?'background:var(--t'+t+')':''}"></i>`; return h + '</span>'; }
+function toast(msg){ const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>el.classList.remove('show'), 3200); }
+function randHex(n){ const a = new Uint8Array(n); (window.crypto||{}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_,i)=>a[i]=Math.random()*256|0); return [...a].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+// SHA-256: usa WebCrypto se c'è, altrimenti un'implementazione JS
+function sha256js(str){
+  const msg = new TextEncoder().encode(str);
+  const K = [], H = []; let n = 2, c = 0;
+  while(c < 64){
+    let p = true; for(let d=2; d*d<=n; d++) if(n%d===0){ p=false; break; }
+    if(p){ if(c<8) H[c] = (Math.pow(n,1/2)*4294967296)|0; K[c] = (Math.pow(n,1/3)*4294967296)|0; c++; }
+    n++;
+  }
+  const l = msg.length, bl = ((l + 9 + 63) >> 6) << 6, b = new Uint8Array(bl);
+  b.set(msg); b[l] = 0x80;
+  const dv = new DataView(b.buffer); dv.setUint32(bl-4, (l*8)>>>0); dv.setUint32(bl-8, Math.floor(l/0x20000000));
+  const W = new Int32Array(64), r = (x,k) => (x>>>k)|(x<<(32-k));
+  for(let o=0; o<bl; o+=64){
+    for(let i=0;i<16;i++) W[i] = dv.getInt32(o+i*4);
+    for(let i=16;i<64;i++){ const a=W[i-15], d=W[i-2]; W[i] = (W[i-16] + (r(a,7)^r(a,18)^(a>>>3)) + W[i-7] + (r(d,17)^r(d,19)^(d>>>10)))|0; }
+    let [a,bb,cc,d,e,f,g,h] = H;
+    for(let i=0;i<64;i++){
+      const t1 = (h + (r(e,6)^r(e,11)^r(e,25)) + ((e&f)^(~e&g)) + K[i] + W[i])|0;
+      const t2 = ((r(a,2)^r(a,13)^r(a,22)) + ((a&bb)^(a&cc)^(bb&cc)))|0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=cc; cc=bb; bb=a; a=(t1+t2)|0;
+    }
+    H[0]=(H[0]+a)|0; H[1]=(H[1]+bb)|0; H[2]=(H[2]+cc)|0; H[3]=(H[3]+d)|0; H[4]=(H[4]+e)|0; H[5]=(H[5]+f)|0; H[6]=(H[6]+g)|0; H[7]=(H[7]+h)|0;
+  }
+  return H.map(x => (x>>>0).toString(16).padStart(8,'0')).join('');
+}
+async function sha(str){
+  try{
+    if(window.crypto && crypto.subtle){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  return sha256js(str);
+}
+
+/* ================= Storage ================= */
+// I dati stanno su Firestore (progetto VrBet) e si raggiungono via HTTP:
+// niente account, basta avere il link. Le scommesse sigillate restano
+// invece nel browser di chi le ha fatte, finché non si rivelano.
+const FB = {
+  projectId: 'vrbet-ae388',
+  apiKey: 'AIzaSyCEPgdS1c8vp2F6tgGIThgWpe_lglHOtms'
+};
+const FBASE = window.__FBASE || `https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents`;
+const fbUrl = (path, extra = '') => `${FBASE}/${path}?key=${FB.apiKey}${extra}`;
+let REMOTE = false, CANWRITE = null;
+const mem = {s:{}, p:{}};
+
+const keyToDoc = k => {
+  if(k.startsWith('l:')) return ['lobbies', k.slice(2)];
+  if(k.startsWith('m:')) return ['matches', k.slice(2)];
+  if(k.startsWith('d:')) return ['debts', k.slice(2)];
+  if(k.startsWith('u:')) return ['lobbyusers', k.slice(2).replace(/:/g, '~')];
+  return ['store', k.replace(/:/g, '~')];
+};
+const docPath = k => { const [c, id] = keyToDoc(k); return `${c}/${encodeURIComponent(id)}`; };
+const collOf = prefix => prefix === 'l:' ? 'lobbies' : prefix === 'm:' ? 'matches' : prefix === 'd:' ? 'debts' : prefix.startsWith('u:') ? 'lobbyusers' : null;
+
+// Spazio privato di questo browser: ci finiscono solo le scelte sigillate e il nome con cui sei entrato
+const localGet = k => { try{ const v = localStorage.getItem('vr:' + k); return v === null ? undefined : JSON.parse(v); }catch(e){ return undefined; } };
+const localSet = (k, v) => { try{ localStorage.setItem('vr:' + k, JSON.stringify(v)); return true; }catch(e){ return false; } };
+const localDel = k => { try{ localStorage.removeItem('vr:' + k); }catch(e){} };
+
+async function sget(k, def = null, shared = true){
+  if(!shared){ const v = localGet(k); return v === undefined ? def : v; }
+  if(!REMOTE){ const v = mem.s[k]; return v === undefined ? def : JSON.parse(v); }
+  try{
+    const res = await fetch(fbUrl(docPath(k)));
+    if(res.status === 404) return def;
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const doc = await res.json();
+    const raw = doc.fields && doc.fields.v && doc.fields.v.stringValue;
+    return raw === undefined ? def : JSON.parse(raw);
+  }catch(e){ console.error('Lettura non riuscita', k, e); return def; }
+}
+// Come sget, ma dice anche se la lettura è riuscita: serve per non sovrascrivere dati veri dopo un errore
+async function sgetSafe(k, shared = true){
+  if(!shared){ const v = localGet(k); return {ok:true, v: v === undefined ? null : v}; }
+  if(!REMOTE){ const v = mem.s[k]; return {ok:true, v: v === undefined ? null : JSON.parse(v)}; }
+  try{
+    const res = await fetch(fbUrl(docPath(k)));
+    if(res.status === 404) return {ok:true, v:null};
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const doc = await res.json();
+    const raw = doc.fields && doc.fields.v && doc.fields.v.stringValue;
+    return {ok:true, v: raw === undefined ? null : JSON.parse(raw)};
+  }catch(e){ console.error('Lettura non riuscita', k, e); return {ok:false, v:null}; }
+}
+async function sset(k, v, shared = true){
+  if(!shared) return localSet(k, v);
+  if(!REMOTE){ mem.s[k] = JSON.stringify(v); return true; }
+  try{
+    const fields = {k:{stringValue:k}, v:{stringValue: JSON.stringify(v)}};
+    if(k.startsWith('u:')) fields.lid = {stringValue: k.slice(2).split(':')[0]};   // per ritrovare i partecipanti di una lobby
+    const res = await fetch(fbUrl(docPath(k)), {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields})
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    CANWRITE = true;
+    return true;
+  }catch(e){
+    console.error('Salvataggio non riuscito', k, e);
+    CANWRITE = false;
+    toast('Salvataggio non riuscito: controlla la connessione e riprova.');
+    return false;
+  }
+}
+async function sdel(k, shared = true){
+  if(!shared){ localDel(k); return; }
+  if(!REMOTE){ delete mem.s[k]; return; }
+  try{
+    const res = await fetch(fbUrl(docPath(k)), {method:'DELETE'});
+    if(!res.ok && res.status !== 404) throw new Error('HTTP ' + res.status);
+  }catch(e){ console.error('Cancellazione non riuscita', k, e); }
+}
+// Restituisce null se l'elenco non arriva: chi chiama tiene i dati che ha già, così non spariscono
+async function slist(prefix, shared = true){
+  if(!shared) return null;
+  if(!REMOTE) return Object.keys(mem.s).filter(k => k.startsWith(prefix));
+  const coll = collOf(prefix);
+  if(!coll) return null;
+  try{
+    const keys = [];
+    let token = '';
+    do{
+      const res = await fetch(fbUrl(coll, '&pageSize=300' + (token ? '&pageToken=' + encodeURIComponent(token) : '')));
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      for(const d of (data.documents || [])){
+        const kk = d.fields && d.fields.k && d.fields.k.stringValue;
+        if(kk && kk.startsWith(prefix)) keys.push(kk);
+      }
+      token = data.nextPageToken || '';
+    } while(token);
+    return keys;
+  }catch(e){ console.error('Elenco non riuscito', prefix, e); return null; }
+}
+
+/* ================= Stato ================= */
+const S = {
+  me:null, players:[], lobbies:{}, matches:{}, debts:{}, users:{}, secrets:{}, ver:{},
+  view:'partite', open:null, openMatch:null, draft:{}, scoreDraft:{}, showPaid:false,
+  busy:false, lastBeat:0, lastSlow:0, lastHtml:'', pending:false, armed:null, closing:null, io:false, ioText:'', diag:'', autoJoined:false, lobbyOk:{}, pwDraft:{}, intro:false, nameDraft:{}
+};
+const ROLES = [['a','Scommettitore 1'],['b','Scommettitore 2']];
+const ukey = (lid, name) => `u:${lid}:${slug(name)}`;
+const ONLINE_MS = 25000;
+const isOnline = u => !!u && Date.now() - (u.seen || 0) < ONLINE_MS;
+const forMatch = (u, m) => (u && m && u.mid === m.id) ? u : null;
+
+async function loadPlayers(){
+  const r = await sgetSafe('players');
+  if(!r.ok) return;                       // lettura fallita: tengo la lista che ho già, non la sovrascrivo
+  let p = r.v;
+  if(!p || !Array.isArray(p.list)){
+    if(S.players.length) return;          // meglio non toccare nulla che riscrivere i nomi con i PIN vuoti
+    p = {list: DEFAULT_PLAYERS.map(n => ({name:n, pin:null}))};
+    await sset('players', p);
+  }
+  S.players = p.list;
+}
+async function loadLobbies(){
+  const keys = await slist('l:');
+  if(!keys) return;
+  const vals = await Promise.all(keys.map(k => sget(k)));
+  const out = {};
+  vals.forEach((l, i) => { const v = l || S.lobbies[keys[i].slice(2)]; if(v && v.id) out[v.id] = v; });
+  if(S.closing) delete out[S.closing];
+  S.lobbies = out;
+  if(S.me){
+    const list = Object.values(out);
+    const mine = await Promise.all(list.map(l => l.pw && !S.lobbyOk[l.id] ? sget('lp:' + l.id, null, false) : null));
+    list.forEach((l, i) => { if(mine[i] && mine[i] === l.pw) S.lobbyOk[l.id] = true; });
+  }
+}
+async function loadMatches(){
+  const keys = await slist('m:');
+  if(!keys) return;
+  const out = {}, todo = [];
+  for(const k of keys){
+    const id = k.slice(2), cached = S.matches[id];
+    if(cached && cached.status === 'chiusa') out[id] = cached; else todo.push(k);
+  }
+  const vals = await Promise.all(todo.map(k => sget(k)));
+  todo.forEach((k, i) => {
+    const m = vals[i] || S.matches[k.slice(2)];
+    if(m && m.lid) out[m.id] = m;
+  });
+  S.matches = out;
+}
+async function loadDebts(){
+  const keys = await slist('d:');
+  if(!keys) return;                       // richiesta fallita: tengo i debiti già in memoria
+  const vals = await Promise.all(keys.map(k => sget(k)));
+  const out = {};
+  keys.forEach((k, i) => {
+    const d = vals[i] || S.debts[k.slice(2)];   // se una lettura non riesce, resto sull'ultimo valore noto
+    if(d && !d.removed) out[d.id] = d;          // i premi eliminati restano fuori per sempre
+  });
+  S.debts = out;
+}
+async function seedDebts(){ /* nessun premio precaricato: lo storico parte vuoto */ }
+
+// Ognuno scrive solo la propria chiave nella lobby: presenza, posto, impronta e rivelazione della partita in corso
+async function saveMe(lid, patch = {}){
+  const k = ukey(lid, S.me);
+  const cur = (await sget(k)) || {name:S.me, joined:Date.now(), role:null, roleTs:null, mid:null, commit:null, reveal:null};
+  Object.assign(cur, patch, {seen:Date.now()});
+  if(await sset(k, cur)){ (S.users[lid] ||= {})[S.me] = cur; S.lastBeat = Date.now(); }
+  return cur;
+}
+// Se due persone prendono lo stesso posto insieme, vince chi l'ha preso prima
+function roleMap(lid){
+  const us = Object.values(S.users[lid] || {}).filter(u => u.role);
+  const map = {};
+  for(const [r] of ROLES){
+    const c = us.filter(u => u.role === r).sort((x,y) => (x.roleTs||0) - (y.roleTs||0) || x.name.localeCompare(y.name));
+    map[r] = c[0] ? c[0].name : null;
+  }
+  return map;
+}
+const commitString = (mid, name, r) => `${mid}|${name}|${(r.bets || []).map(b => [b.cid, b.label, b.t, b.pick, b.note || ''].join('~')).join('#')}|${(r.prize || []).join(',')}|${r.salt}`;
+// Una scommessa è bloccata solo per chi l'ha già vinta in questa lobby
+// Una scommessa è bloccata solo per chi l'ha già vinta in questa lobby
+function wonCids(lid, name){
+  const won = {};
+  for(const mm of Object.values(S.matches)){
+    if(mm.lid !== lid || mm.status !== 'chiusa') continue;
+    for(const k of ['a','b']){
+      const r = mm.picks?.[k];
+      if(r && mm[k] === name && mm.results?.[k] === 'won') for(const cid of recCids(r)) won[cid] = true;
+    }
+  }
+  return won;
+}
+const currentMatch = l => l && l.current ? S.matches[l.current] || null : null;
+
+async function loadLobby(lid){
+  const l = await sget('l:' + lid);
+  if(!l){ delete S.lobbies[lid]; if(S.open === lid){ S.open = null; toast('L\'admin ha chiuso la lobby.'); } return; }
+  S.lobbies[lid] = l;
+  const ukeys = await slist(`u:${lid}:`);
+  if(ukeys){
+    const fresh = {};
+    for(const u of await Promise.all(ukeys.map(k => sget(k)))) if(u) fresh[u.name] = u;
+    S.users[lid] = fresh;
+  }
+  const users = S.users[lid] || (S.users[lid] = {});
+  let m = null;
+  if(l.current){
+    const c = S.matches[l.current];
+    m = c && c.status === 'chiusa' ? c : await sget('m:' + l.current);
+    if(m) S.matches[m.id] = m;
+  }
+  const live = m && m.status === 'scommesse';
+  const me = users[S.me];
+  if(!live && me?.role && roleMap(lid)[me.role] !== S.me){
+    await saveMe(lid, {role:null, roleTs:null});
+    toast('Qualcuno ha preso quel posto un attimo prima di te.');
+  }
+  if(!live) return;
+  const iAm = S.me === m.a || S.me === m.b;
+  if(iAm && !S.secrets[m.id]) S.secrets[m.id] = await sget('s:' + m.id, null, false);
+  const ua = forMatch(users[m.a], m), ub = forMatch(users[m.b], m), mine = forMatch(users[S.me], m);
+  // Rivelazione automatica appena hanno confermato entrambi
+  if(iAm && ua?.commit && ub?.commit && mine && !mine.reveal && S.secrets[m.id]) await saveMe(lid, {reveal:S.secrets[m.id]});
+  const ra = forMatch(S.users[lid][m.a], m), rb = forMatch(S.users[lid][m.b], m);
+  if(ra?.reveal && rb?.reveal && !S.ver[m.id]){
+    const all = catalog(m).flatMap(g => g.items);
+    const check = async (name, u) => {
+      const r = normRec(u.reveal);
+      const okT = r.bets.every(b => {
+        const item = all.find(x => x.cid === b.cid);
+        return item && (item.k === 'quote' ? b.t === quoteTier(m, b.pick) : item.t === b.t);
+      });
+      const okPrize = r.bets.length === 1 ? r.prize[0] === r.bets[0].t
+        : JSON.stringify(r.prize) === JSON.stringify(comboPrize(r.bets[0].t, r.bets[1].t));
+      return okT && okPrize && (await sha(commitString(m.id, name, u.reveal))) === u.commit;
+    };
+    S.ver[m.id] = {[m.a]: await check(m.a, ra), [m.b]: await check(m.b, rb)};
+  }
+}
+
+/* ================= Render ================= */
+function render(){
+  const who = $('#who');
+  const banner = REMOTE ? '' : `<div class="banner"><b>I dati non vengono salvati.</b> L'app non riesce a raggiungere il database, quindi quello che fai resta solo in questa finestra e nessun altro lo vede. Succede se sei senza connessione, oppure se una rete o un blocco pubblicità sta bloccando le richieste a Google.
+    <button class="btn small" data-act="retryStorage">Riprova a collegarti</button></div>`;
+  if(!S.me){ who.innerHTML = ''; $('#tabs').hidden = true; $('#app').innerHTML = banner + viewLogin(); return; }
+  who.innerHTML = `<span>Connesso come <b>${esc(S.me)}</b></span><button class="linkbtn" data-act="logout">Cambia utente</button>`;
+  $('#tabs').hidden = false;
+  const active = S.open ? 'partite' : S.openMatch ? 'storico' : S.view;
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.view === active));
+  let html;
+  if(S.open) html = viewLobby(S.lobbies[S.open]);
+  else if(S.openMatch) html = viewClosedMatch(S.matches[S.openMatch]);
+  else if(S.intro) html = viewIntro();
+  else html = {partite:viewPartite, debiti:viewDebiti, storico:viewStorico, scheda:viewScheda}[S.view]();
+  const out = banner + html;
+  // Non ridisegno se non è cambiato nulla, né mentre un menu a tendina è aperto
+  if(out === S.lastHtml && $('#app').innerHTML) return;
+  if(document.activeElement && document.activeElement.tagName === 'SELECT'){ S.pending = true; return; }
+  S.pending = false; S.lastHtml = out;
+  const a = document.activeElement;
+  const keyAttr = a && ['INPUT','SELECT','TEXTAREA'].includes(a.tagName)
+    ? ['data-name','data-pw','data-score','data-dbet','data-dpick','data-dsubj','data-dnote','id']
+        .map(k => a.getAttribute(k) !== null ? `[${k}="${a.getAttribute(k)}"]` : null).find(Boolean)
+    : null;
+  const caret = keyAttr && a.setSelectionRange ? [a.selectionStart, a.selectionEnd] : null;
+  $('#app').innerHTML = out;
+  if(keyAttr){
+    const el = $('#app').querySelector(keyAttr);
+    if(el){ el.focus(); if(caret && el.setSelectionRange){ try{ el.setSelectionRange(caret[0], caret[1]); }catch(e){} } }
+  }
+}
+
+function viewLogin(){
+  const opts = S.players.map(p => `<option value="${esc(p.name)}">${esc(p.name)}${p.pin?'':' (primo accesso)'}</option>`).join('');
+  return `
+  <h2>Chi sei?</h2>
+  <p class="lead">Scegli il tuo nome. Al primo accesso imposti un PIN di 4 cifre: servirà a te per rientrare e agli altri per non spacciarsi per te. Segnatelo, perché non si può recuperare.</p>
+  <div class="panel">
+    <div class="grid">
+      <label>Nome<select id="lgName">${opts}</select></label>
+      <label>PIN<input id="lgPin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+    </div>
+    <div class="actions"><button class="btn" data-act="login">Entra</button><span class="msg" id="lgMsg"></span></div>
+  </div>
+  <h2>Non sei nella lista?</h2>
+  <div class="panel">
+    <div class="grid">
+      <label>Il tuo nome<input id="npName" maxlength="20" placeholder="Es. Andrea"></label>
+      <label>Scegli un PIN<input id="npPin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+    </div>
+    <div class="actions"><button class="btn ghost" data-act="addPlayer">Aggiungiti al gruppo</button><span class="msg" id="npMsg"></span></div>
+  </div>`;
+}
+
+function personLine(lid, name){
+  const on = isOnline((S.users[lid] || {})[name]);
+  return `<span class="person"><span class="dot ${on?'on':''}" aria-hidden="true"></span>${esc(name)}${on ? '' : ' <span class="meta">(non connesso)</span>'}</span>`;
+}
+
+
+function viewIntro(){
+  return `<div class="intro">
+    <h2 style="margin-top:0">Benvenuto: come funziona</h2>
+    <p class="lead">Non serve nessun account: basta il link del gruppo. I dati stanno su un database comune, quindi quello che fai lo vedono tutti gli altri.</p>
+    <p class="lead">Se in cima vedi un avviso giallo, l'app non sta raggiungendo il database: controlla la connessione, disattiva eventuali blocchi pubblicità su questa pagina e premi “Riprova a collegarti”.</p>
+    <p class="lead"><b>Come si gioca</b></p>
+    <ol class="introl">
+      <li>Uno dei due che scommettono crea la lobby e sceglie una password, diventando l'admin.</li>
+      <li>L'altro apre lo stesso link, inserisce la password ed entra.</li>
+      <li>Ognuno prende il suo posto da scommettitore, poi l'admin fa partire la partita.</li>
+      <li>Ognuno sceglie la sua scommessa: resta sigillata finché non avete confermato entrambi.</li>
+      <li>A fine partita l'admin segna chi ha indovinato e chiude: la partita va nello storico e i premi in “Chi deve cosa”.</li>
+    </ol>
+    <p class="meta">Il tuo PIN ti serve a ogni accesso e resta ricordato su questo dispositivo: se lo dimentichi, nessuno può recuperarlo. Questa schermata non ricomparirà, ma trovi tutte le regole nella scheda “Scheda”.</p>
+    <div class="actions"><button class="btn bolt" data-act="dismissIntro">Ho capito, iniziamo</button></div>
+  </div>`;
+}
+
+function viewPartite(){
+  const open = Object.values(S.lobbies).sort((a,b) => b.ts - a.ts);
+  const mine = open.find(l => l.by === S.me);
+  const list = open.map(l => {
+    const ok = !l.pw || S.lobbyOk[l.id] || l.by === S.me;
+    return `<div class="panel" style="margin-bottom:10px">
+      <div class="lobbytitle">Lobby di ${esc(l.by)}${l.by === S.me ? ' (la tua)' : ''}</div>
+      <div class="meta">${l.state === 'live' ? 'Partita in corso' : 'In preparazione della partita'}${l.p1 && l.p2 ? `, ${esc(l.p1)} contro ${esc(l.p2)}` : ''}</div>
+      ${ok ? '' : `<div class="grid" style="margin-top:12px"><label>Password della lobby<input data-pw="${l.id}" autocomplete="off" autocapitalize="off" value="${esc(S.pwDraft[l.id] || '')}"></label></div>`}
+      <div class="actions"><button class="btn bolt" data-act="join" data-id="${l.id}">Entra nella lobby</button><span class="msg" id="pwmsg_${l.id}"></span></div>
+    </div>`;
+  }).join('');
+  return `
+    <h2>Lobby aperte</h2>
+    ${open.length ? list : '<div class="panel empty">Nessuna lobby aperta in questo momento.</div>'}
+    <h2>${mine ? 'La tua lobby' : 'Apri la tua lobby'}</h2>
+    <div class="panel">
+      ${mine
+        ? `<p class="lead">Hai già una lobby aperta: puoi averne una alla volta. Per aprirne un'altra, chiudi prima questa dall'interno.</p>
+           <div class="actions" style="margin-top:0"><button class="btn bolt" data-act="join" data-id="${mine.id}">Vai alla tua lobby</button><button class="btn ghost" data-act="refresh">Aggiorna</button></div>`
+        : `<p class="lead">Ognuno può aprire la propria lobby, anche più lobby insieme. Scegli una password e passala all'altro scommettitore.</p>
+           <div class="grid"><label>Password della lobby<input data-pw="new" autocomplete="off" autocapitalize="off" placeholder="Almeno 4 caratteri" value="${esc(S.pwDraft.new || '')}"></label></div>
+           <div class="actions"><button class="btn bolt" data-act="createLobby">Crea la lobby</button><button class="btn ghost" data-act="refresh">Aggiorna</button><span class="msg" id="newPwMsg"></span></div>`}
+    </div>`;
+}
+
+function viewLobby(l){
+  if(!l) return '<p class="lead">Lobby non trovata.</p>';
+  const m = currentMatch(l);
+  const live = m && m.status === 'scommesse';
+  const users = Object.values(S.users[l.id] || {}).sort((a,b) => a.joined - b.joined);
+  let h = `<div class="actions" style="margin:0 0 12px"><button class="btn ghost small" data-act="leave">Esci dalla lobby</button></div>
+    <div class="lobbyhead"><div><span class="meta">Lobby</span><div class="bigcode" style="font-size:2.2rem;letter-spacing:0">di ${esc(l.by)}</div></div>
+    <div class="meta" style="text-align:right">Admin: ${esc(l.by)}<br><b style="color:var(--navy)">${live ? 'Partita in corso' : 'Preparazione'}</b></div></div>
+    <p class="lead" style="margin-top:12px">Nella lobby: ${users.length ? users.map(u => personLine(l.id, u.name)).join(' ') : 'nessuno'}</p>`;
+  if(live) h += betBody(l, m);
+  else {
+    if(m && m.status === 'chiusa') h += `<div class="panel" style="margin-top:6px"><span class="meta">Ultima partita</span><div class="name" style="font-weight:600">${esc(m.p1)} ${scoreText(m)} ${esc(m.p2)}: ${outcomeText(m)}</div></div>`;
+    h += prepBody(l);
+  }
+  if(S.me === l.by) h += `<div class="actions" style="margin-top:26px"><button class="btn ghost small" data-act="closeLobby" data-id="${l.id}" data-label="Chiudi la lobby">${armLabel('closeLobby', l.id, 'Chiudi la lobby')}</button><span class="meta">Le partite già chiuse restano nello storico.</span></div>`;
+  return h;
+}
+
+function prepBody(l){
+  const admin = S.me === l.by;
+  const rm = roleMap(l.id);
+  const myRole = Object.keys(rm).find(r => rm[r] === S.me);
+  const slot = ([r, label]) => {
+    const who = rm[r];
+    let btn = '';
+    if(!who) btn = `<button class="btn bolt small" data-act="takeRole" data-role="${r}">${myRole ? 'Spostati qui' : 'Prendi il posto'}</button>`;
+    else if(who === S.me) btn = `<button class="btn ghost small" data-act="leaveRole">Lascia il posto</button>`;
+    else if(admin) btn = `<button class="btn ghost small" data-act="freeRole" data-name="${esc(who)}">Libera</button>`;
+    return `<div class="slot"><span class="meta">${label}</span><b>${who ? personLine(l.id, who) : 'Posto libero'}</b><div class="actions" style="margin-top:8px">${btn}</div></div>`;
+  };
+  const miss = ROLES.filter(([r]) => !rm[r]).map(([,label]) => label.toLowerCase());
+  if(!(S.nameDraft.p1 ?? l.p1) || !(S.nameDraft.p2 ?? l.p2)) miss.push('i nomi di chi gioca');
+  const np1 = S.nameDraft.p1 ?? l.p1 ?? '', np2 = S.nameDraft.p2 ?? l.p2 ?? '';
+  const pair = quoteFor(np1, np2);
+  const quoteBox = (a, bb) => `<div class="quotes">${quoteOptions({p1:a, p2:bb}).map(([o, tt]) => `<div><span class="meta">${esc(o)}</span><b>${TIERS[tt]}</b></div>`).join('')}</div>`;
+  const psel = (key, list, lab) => `<label>${lab}<select data-name="${key}"><option value="">Scegli…</option>${list.map(n => `<option ${n===(key==='p1'?np1:np2)?'selected':''}>${esc(n)}</option>`).join('')}</select></label>`;
+  let names;
+  if(admin) names = `<h2>Chi gioca la partita</h2><div class="panel">
+      <p class="lead">Chi gioca non entra nell'app: i nomi servono per le quote 1X2 di quella coppia.</p>
+      <div class="grid">${psel('p1', FIRST_SLOT, 'Giocatore 1')}${psel('p2', SECOND_SLOT, 'Giocatore 2')}</div>
+      ${pair ? quoteBox(np1, np2) : '<p class="meta" style="margin:10px 0 0">Scegli i due nomi per vedere le quote 1X2 della coppia.</p>'}</div>`;
+  else names = `<h2>Chi gioca la partita</h2><div class="panel"><b>${l.p1 && l.p2 ? esc(l.p1) + ' contro ' + esc(l.p2) : 'Li sta scegliendo l\'admin'}</b>
+      ${pair ? quoteBox(l.p1, l.p2) : ''}</div>`;
+  const start = admin
+    ? `<div class="actions"><button class="btn" data-act="start" data-id="${l.id}" ${miss.length?'disabled':''}>Inizia la partita</button><span class="meta">${miss.length ? 'Manca: ' + miss.join(', ') + '.' : 'Tutto pronto.'}</span></div>`
+    : `<p class="lead" style="margin-top:14px">${miss.length ? 'Si aspetta: ' + miss.join(', ') + '.' : 'Tutto pronto: l\'admin può far partire la partita.'}</p>`;
+  return `
+    <h2>Scommettitori</h2>
+    <p class="lead">Bastate voi due: chi ha creato la lobby e chi è entrato con la password.</p>
+    <div class="slots">${ROLES.map(slot).join('')}</div>
+    ${names}
+    ${start}`;
+}
+
+
+function betBody(l, m){
+  const users = S.users[l.id] || {};
+  const ua = forMatch(users[m.a], m), ub = forMatch(users[m.b], m);
+  const both = ua?.commit && ub?.commit, rev = ua?.reveal && ub?.reveal;
+  const iAm = S.me === m.a || S.me === m.b;
+  const stat = (name, u) => {
+    let s = 'Sta scegliendo';
+    if(u?.reveal) s = 'Scommessa rivelata';
+    else if(u?.commit) s = both ? 'Ha confermato, rivela a breve' : 'Ha confermato';
+    return `<div><span class="meta">${personLine(l.id, name)}</span><b>${s}</b></div>`;
+  };
+  let h = `<h2>${esc(m.p1)} contro ${esc(m.p2)}</h2><div class="status">${stat(m.a, ua)}${stat(m.b, ub)}</div>`;
+  if(rev) return h + resultBody(l, m, ua.reveal, ub.reveal);
+  if(both){
+    const miss = [m.a, m.b].filter(n => !forMatch(users[n], m)?.reveal);
+    h += `<div class="banner">Hanno confermato entrambi. La scommessa di ${miss.map(esc).join(' e ')} compare appena ${miss.length > 1 ? 'hanno' : 'ha'} l'app aperta.</div>`;
+  }
+  if(iAm && !forMatch(users[S.me], m)?.commit){
+    h += `<h2>La tua scommessa</h2><p class="lead">Una sola a testa. Dopo la conferma non puoi più cambiarla, e l'altro la vede solo quando ha confermato anche lui.</p>
+      <div class="panel pick">${betForm(m)}</div>
+      <div class="actions"><button class="btn bolt" data-act="commit" data-id="${m.id}">Conferma la mia scommessa</button><span class="msg" id="cmMsg"></span></div>`;
+  } else if(iAm){
+    const sec = S.secrets[m.id];
+    h += `<h2>La tua scommessa</h2><div class="panel">${sec ? `${recHead(sec)}<strong style="font-size:1.15rem">${esc(recPick(sec))}</strong>` : '<span class="msg">Non trovata su questo account: è stata salvata da un altro account.</span>'}
+      <p class="meta" style="margin:6px 0 0">La vedi solo tu finché non ha confermato anche l'altro.</p></div>`;
+  } else {
+    h += '<p class="lead">Le scommesse restano sigillate finché non hanno confermato entrambi.</p>';
+  }
+  if(S.me === l.by) h += `<div class="actions" style="margin-top:18px"><button class="btn ghost small" data-act="cancelMatch" data-id="${m.id}" data-label="Annulla la partita">${armLabel('cancelMatch', m.id, 'Annulla la partita')}</button></div>`;
+  return h;
+}
+
+function resultBody(l, m, ra, rb){
+  const admin = S.me === l.by;
+  const ver = S.ver[m.id] || {}, res = m.results || {};
+  const mark = v => v === undefined ? '' : v ? ' <span class="ok" title="Corrisponde a quanto confermato">✓</span>' : ' <span class="msg">non corrisponde a quanto confermato</span>';
+  const btn = (key, v, txt) => `<button class="btn ghost small" aria-pressed="${res[key]===v}" data-act="result" data-id="${m.id}" data-key="${key}" data-v="${v}">${txt}</button>`;
+  const card = (key, name, r) => `<div class="betpick"><span class="meta">Scommessa di ${esc(name)}</span>${recHead(r)}
+      <strong style="font-size:1.15rem">${esc(recPick(r))}</strong>${mark(ver[name])}
+      ${admin ? `<div class="outcome" style="margin-top:10px">${btn(key,'won','Indovinata')}${btn(key,'lost','Sbagliata')}</div>`
+              : `<div class="meta" style="margin-top:6px">${res[key]==='won' ? 'Indovinata' : res[key]==='lost' ? 'Sbagliata' : 'L\'admin deve ancora segnare l\'esito'}</div>`}</div>`;
+  const prizes = [];
+  if(res.a === 'won') prizes.push(`${esc(m.b)} deve a ${esc(m.a)}: ${prizeText(normRec(ra)).toLowerCase()}`);
+  if(res.b === 'won') prizes.push(`${esc(m.a)} deve a ${esc(m.b)}: ${prizeText(normRec(rb)).toLowerCase()}`);
+  const ready = !!res.a && !!res.b;
+  const sd = S.scoreDraft[m.id] || {}, sc = m.score || {};
+  const g1 = sd.g1 ?? sc.g1 ?? '', g2 = sd.g2 ?? sc.g2 ?? '';
+  let h = `<h2>Scommesse rivelate</h2><div class="list">${card('a', m.a, ra)}${card('b', m.b, rb)}</div>`;
+  if(ready) h += `<div class="panel" style="margin-top:12px"><span class="meta">Premi di questa partita</span><div class="name" style="font-weight:600">${prizes.length ? prizes.join('<br>') : 'Nessuno ha indovinato, niente premi.'}</div></div>`;
+  if(admin){
+    h += `<h2>A fine partita</h2><div class="panel">
+      <p class="lead">Segna sopra quali scommesse sono state indovinate, inserisci il risultato e chiudi la partita.</p>
+      <div class="grid">
+        <label>Gol ${esc(m.p1)}<input data-score="g1" type="number" min="0" inputmode="numeric" value="${esc(g1)}"></label>
+        <label>Gol ${esc(m.p2)}<input data-score="g2" type="number" min="0" inputmode="numeric" value="${esc(g2)}"></label>
+      </div>
+      <div class="actions"><button class="btn" data-act="close" data-id="${m.id}" ${ready?'':'disabled'}>Chiudi la partita e salvala nello storico</button>
+      ${ready ? '' : '<span class="meta">Segna prima l\'esito di entrambe le scommesse.</span>'}</div></div>`;
+  } else {
+    h += `<p class="lead" style="margin-top:14px">A fine partita l'admin (${esc(l.by)}) segna l'esito e chiude la partita.</p>`;
+  }
+  return h;
+}
+
+function outcomeText(m){
+  const w = ['a','b'].filter(k => m.results?.[k] === 'won').map(k => esc(m[k]));
+  return w.length ? (w.length > 1 ? 'vincono ' : 'vince ') + w.join(' e ') : 'nessuno ha indovinato';
+}
+function outcomeLines(m){
+  return ['a','b'].map(k => {
+    const r = m.picks?.[k]; if(!r) return '';
+    const won = m.results?.[k] === 'won';
+    return `${esc(m[k])}: ${esc(recLabel(r))}, ${esc(recPick(r))}. ${won ? 'Indovinata, ' + prizeText(normRec(r)).toLowerCase() : 'Sbagliata'}`;
+  }).filter(Boolean);
+}
+const scoreText = m => m.score ? `${m.score.g1}–${m.score.g2}` : 'contro';
+
+function recHead(r){
+  const n = normRec(r);
+  return `<div class="head">${gauge(Math.max(...n.prize))}<div><div class="name" style="font-weight:600">${esc(recLabel(n))}</div><div class="meta">${prizeText(n)}${n.bets.length > 1 ? ', combo: devono essere giuste tutte e due' : ''}</div></div></div>`;
+}
+
+function betForm(m){
+  const d = S.draft[m.id] || {};
+  const won = wonCids(m.lid, S.me);
+  const pair = quoteFor(m.p1, m.p2);
+  const cat = catalog(m);
+  const all = cat.flatMap(g => g.items);
+  const find = cid => all.find(x => x.cid === cid);
+  const tierOf = (x, pick) => x ? (x.k === 'quote' ? quoteTier(m, pick) : x.t) : null;
+  const b1 = find(d.cid), b2 = d.combo ? find(d.cid2) : null;
+  const t1 = tierOf(b1, d.pick), t2 = tierOf(b2, d.pick2);
+
+  const selector = (n, cur, other) => {
+    const label = x => x.k === 'quote'
+      ? `${esc(x.name)}: quote della coppia`
+      : `${esc(x.name)}${x.tag ? ' (' + esc(x.tag) + ')' : ''}: ${TIERS[x.t].toLowerCase()}`;
+    return `<label>${n === 1 ? 'Scommessa' : 'Seconda scommessa'}<select data-dbet="${n}"><option value="">Scegli…</option>${cat.map(g => {
+      const items = g.items.filter(x => !x.needPair || pair);
+      if(!items.length) return '';
+      return `<optgroup label="${g.cat}">${items.map(x => {
+        const off = won[x.cid] || x.cid === other;
+        return `<option value="${x.cid}" ${x.cid===cur?'selected':''} ${off?'disabled':''}>${label(x)}${won[x.cid] ? ' — già vinta stasera' : x.cid === other ? ' — già scelta sopra' : ''}</option>`;
+      }).join('')}</optgroup>`;
+    }).join('')}</select></label>`;
+  };
+
+  const detail = (n, x, pick, subj) => {
+    if(!x) return '';
+    let h = '';
+    if(x.subj) h += `<label style="margin-top:8px">${esc(x.subj)}<input data-dsubj="${n}" placeholder="Nome del giocatore" value="${esc(subj || '')}"></label>`;
+    if(x.k === 'quote'){
+      h += `<label style="margin-top:8px">La tua previsione<select data-dpick="${n}"><option value="">Scegli…</option>${quoteOptions(m).map(([o]) => `<option ${o===pick?'selected':''}>${esc(o)}</option>`).join('')}</select></label>
+        <div class="quotes">${quoteOptions(m).map(([o, tt]) => `<div><span class="meta">${esc(o)}</span><b>${TIERS[tt]}</b></div>`).join('')}</div>`;
+    } else {
+      const opts = optionsFor(x, m);
+      if(x.k === 'yes') h += '<p class="meta" style="margin:8px 0 0">Su questa scommessa si punta solo sul sì.</p>';
+      else if(opts) h += `<label style="margin-top:8px">La tua previsione<select data-dpick="${n}"><option value="">Scegli…</option>${opts.map(o => `<option ${o===pick?'selected':''}>${esc(o)}</option>`).join('')}</select></label>`;
+      else if(x.k === 'num') h += `<label style="margin-top:8px">La tua previsione<input type="number" min="0" inputmode="numeric" data-dpick="${n}" value="${esc(pick || '')}"></label>`;
+      else if(x.k === 'score') h += `<label style="margin-top:8px">La tua previsione<input data-dpick="${n}" placeholder="Gol ${esc(m.p1)}-gol ${esc(m.p2)}, es. 3-2" value="${esc(pick || '')}"></label>`;
+      else h += `<label style="margin-top:8px">La tua previsione<input data-dpick="${n}" placeholder="${esc(x.ph || '')}" value="${esc(pick || '')}"></label>`;
+    }
+    h += `<label style="margin-top:8px">Dettaglio (facoltativo)<input data-dnote="${n}" maxlength="60" placeholder="Es. il nome del giocatore che segna" value="${esc(n === 1 ? (d.note || '') : (d.note2 || ''))}"></label>`;
+    return h;
+  };
+
+  let h = selector(1, d.cid, d.cid2) + detail(1, b1, d.pick, d.subj);
+  if(b1){
+    h += `<label class="toggle" style="margin-top:14px"><input type="checkbox" data-dcombo="1" ${d.combo?'checked':''}> Combo: aggiungi una seconda scommessa</label>`;
+    if(d.combo) h += `<div class="combo">${selector(2, d.cid2, d.cid) + detail(2, b2, d.pick2, d.subj2)}</div>`;
+  }
+  let prize = null;
+  if(t1 && (!d.combo || t2)) prize = d.combo ? comboPrize(t1, t2) : [t1];
+  if(prize) h += `<div class="prizebox"><span class="meta">Premio in palio</span><b>${prize.map(t => TIERS[t]).join(' + ')}</b>
+    ${d.combo ? '<p class="meta" style="margin:6px 0 0">Nella combo devono essere giuste tutte e due: se ne sbagli una, non vinci niente.</p>' : ''}</div>`;
+  h += '<p class="meta" style="margin:10px 0 0">Il dettaglio è sigillato con la previsione, ma non cambia il premio.</p>';
+  return h;
+}
+function viewClosedMatch(m){
+  if(!m) return '<p class="lead">Partita non trovata.</p>';
+  const card = k => { const r = m.picks?.[k]; if(!r) return ''; const won = m.results?.[k] === 'won';
+    return `<div class="betpick"><span class="meta">Scommessa di ${esc(m[k])}</span>${recHead(r)}<strong style="font-size:1.1rem">${esc(recPick(r))}</strong>
+      <div class="prize" style="margin-top:6px">${won ? 'Indovinata: ' + prizeText(normRec(r)).toLowerCase() : 'Sbagliata'}</div></div>`; };
+  return `<div class="actions" style="margin:0 0 12px"><button class="btn ghost small" data-act="backStorico">Torna allo storico</button></div>
+  <h2>${esc(m.p1)} ${scoreText(m)} ${esc(m.p2)}</h2>
+  <p class="lead">Scommettevano ${esc(m.a)} e ${esc(m.b)}. Chiusa il ${fmtDate(m.closedAt)}, ${outcomeText(m)}.</p>
+  <div class="list">${card('a')}${card('b')}</div>
+  ${S.me === m.by ? `<div class="actions" style="margin-top:24px"><button class="btn ghost small" data-act="delMatch" data-id="${m.id}" data-label="Elimina la partita">${armLabel('delMatch', m.id, 'Elimina la partita')}</button><span class="meta">Elimina anche i premi che ha generato.</span></div>` : ''}`;
+}
+
+function viewStorico(){
+  const closed = Object.values(S.matches).filter(m => m.status === 'chiusa').sort((a,b) => (b.closedTs||0) - (a.closedTs||0));
+  const pairs = {};
+  closed.filter(m => m.score).forEach(m => {
+    const [x,y] = [m.p1,m.p2].sort(), k = x + '|' + y;
+    pairs[k] = pairs[k] || {x, y, wx:0, wy:0, d:0};
+    const w = m.score.g1 > m.score.g2 ? m.p1 : m.score.g2 > m.score.g1 ? m.p2 : null;
+    if(!w) pairs[k].d++; else if(w === x) pairs[k].wx++; else pairs[k].wy++;
+  });
+  const pr = Object.values(pairs);
+  const h2h = pr.length ? `<table><thead><tr><th>Sfida</th><th class="num">Vittorie</th><th class="num">Pari</th><th>Favorito</th></tr></thead><tbody>${pr.map(p => {
+      const tot = p.wx + p.wy + p.d; let fav = tot < 5 ? `Mancano ${5-tot} partite` : 'Equilibrata';
+      if(tot >= 5){ if(p.wx/tot >= .7) fav = `${esc(p.x)}: premio −1 livello`; else if(p.wy/tot >= .7) fav = `${esc(p.y)}: premio −1 livello`; }
+      return `<tr><td>${esc(p.x)} contro ${esc(p.y)}</td><td class="num">${p.wx}–${p.wy}</td><td class="num">${p.d}</td><td>${fav}</td></tr>`;
+    }).join('')}</tbody></table>` : '<div class="panel empty">Gli scontri diretti compaiono dopo la prima partita chiusa con il risultato.</div>';
+  return `<h2>Scontri diretti</h2>${h2h}
+  <h2>Partite chiuse</h2>
+  ${closed.length ? closed.map(m => `<div class="card"><div><div class="title">${esc(m.p1)} ${scoreText(m)} ${esc(m.p2)}</div>
+    <div class="meta">${fmtDate(m.closedAt)}, scommettevano ${esc(m.a)} e ${esc(m.b)}</div>
+    <div class="meta">${outcomeLines(m).join('<br>')}</div></div>
+    <button class="btn ghost small" data-act="openMatch" data-id="${m.id}">Dettagli</button></div>`).join('') : '<div class="panel empty">Nessuna partita chiusa per ora.</div>'}`;
+}
+
+function viewDebiti(){
+  const all = Object.values(S.debts).sort((a,b)=>(b.ts||0)-(a.ts||0) || (b.date||'').localeCompare(a.date||''));
+  const open = all.filter(d => !d.paid);
+  const names = [...new Set([...S.players.map(p=>p.name), ...all.flatMap(d=>[d.da,d.a])])];
+  const rows = names.map(p => { const give = open.filter(d=>d.da===p).reduce((s,d)=>s+d.t,0), get = open.filter(d=>d.a===p).reduce((s,d)=>s+d.t,0); return {p,give,get,net:get-give}; }).sort((a,b)=>b.net-a.net);
+  const list = all.filter(d => S.showPaid || !d.paid);
+  const pOpts = S.players.map(p=>`<option>${esc(p.name)}</option>`).join('');
+  return `
+  <h2>Saldi</h2>
+  <p class="lead">I punti corrispondono al livello del premio, da acqua (1) a drink costoso (5). Contano solo i premi non ancora ricevuti.</p>
+  <table><thead><tr><th>Giocatore</th><th class="num">Deve dare</th><th class="num">Deve ricevere</th><th class="num">Saldo</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>${esc(r.p)}</td><td class="num">${r.give}</td><td class="num">${r.get}</td><td class="num ${r.net>0?'pos':r.net<0?'neg':''}">${r.net>0?'+':''}${r.net}</td></tr>`).join('')}</tbody></table>
+  <h2>Premi da pagare</h2>
+  <div class="actions" style="margin:0 0 10px"><label class="toggle"><input type="checkbox" data-act="showPaid" ${S.showPaid?'checked':''}> Mostra anche quelli già ricevuti</label><button class="btn ghost small" data-act="refresh">Aggiorna</button></div>
+  <div class="list">${list.length ? list.map(d => `<div class="row ${d.paid?'paid':''}">${gauge(d.t)}
+    <div><div class="name">${esc(d.da)} deve a ${esc(d.a)}: ${TIERS[d.t].toLowerCase()}</div><div class="meta">${fmtDate(d.date)}, ${esc(d.bet)}</div></div>
+    <div class="end">${S.me===d.a ? `<div class="actions" style="margin:0;gap:6px"><button class="btn ${d.paid?'ghost':''} small" data-act="paid" data-id="${d.id}">${d.paid?'Segna da ricevere':'Segna ricevuto'}</button><button class="btn ghost small" data-act="delDebt" data-id="${d.id}">${armLabel('delDebt', d.id, 'Elimina')}</button></div>` : `<span class="meta">${d.paid?'Ricevuto':'Da pagare'}</span>`}</div></div>`).join('') : '<div class="empty">Nessun premio in sospeso.</div>'}</div>
+  <p class="meta">Solo chi riceve il premio può segnarlo come ricevuto o eliminarlo.</p>
+  <h2>Trasferire i dati da un'altra versione</h2>
+  <details class="panel" ${S.io ? 'open' : ''}>
+    <summary style="cursor:pointer;font-weight:600">Esporta o importa premi e storico</summary>
+    <p class="lead" style="margin-top:10px">Ogni link pubblicato ha la sua memoria separata. Per portare qui i dati di una versione precedente: apri il vecchio link, premi “Esporta”, copia il testo e incollalo qui sotto.</p>
+    <div class="actions" style="margin-top:0"><button class="btn ghost" data-act="exportData">Esporta</button></div>
+    <label style="margin-top:12px">Testo dei dati<textarea id="ioBox" rows="6" style="width:100%;margin-top:4px;padding:9px 10px;border:1px solid var(--line);border-radius:6px;font-family:monospace;font-size:.8rem">${esc(S.ioText || '')}</textarea></label>
+    <div class="actions"><button class="btn" data-act="importData">Importa qui</button><span class="msg" id="ioMsg"></span></div>
+    <p class="meta">L'importazione aggiunge premi e partite senza cancellare quelli già presenti: se una riga esiste già, viene sovrascritta con quella importata.</p>
+  </details>
+  <h2>Aggiungi un premio a mano</h2>
+  <div class="panel"><div class="grid">
+    <label>Chi paga<select id="mdDa">${pOpts}</select></label>
+    <label>A chi<select id="mdA">${pOpts}</select></label>
+    <label>Premio<select id="mdT">${Object.keys(TIERS).map(t=>`<option value="${t}">${TIERS[t]}</option>`).join('')}</select></label>
+    <label>Motivo<input id="mdBet" placeholder="Es. scommessa fatta a voce"></label>
+  </div><div class="actions"><button class="btn ghost" data-act="manualDebt">Aggiungi premio</button><span class="msg" id="mdMsg"></span></div></div>`;
+}
+
+function viewScheda(){
+  const demo = {p1:'Giocatore 1', p2:'Giocatore 2'};
+  const rows = QUOTE.map(q => `<tr><td>${esc(q.a)} contro ${esc(q.b)}</td><td>${TIERS[q.t[0]]}</td><td>${TIERS[q.t[1]]}</td><td>${TIERS[q.t[2]]}</td></tr>`).join('');
+  return `<h2>Regole</h2><div class="panel rules"><ol>${RULES.map(r => `<li>${esc(r)}</li>`).join('')}</ol></div>
+  <h2>Diagnostica</h2>
+  <details class="panel">
+    <summary style="cursor:pointer;font-weight:600">Controlla se questo dispositivo è collegato</summary>
+    <table style="margin-top:12px"><tbody>
+      <tr><td>Collegato al database</td><td><b>${REMOTE ? 'sì' : 'no'}</b></td></tr>
+      <tr><td>Scrittura riuscita</td><td><b>${CANWRITE === true ? 'sì' : CANWRITE === false ? 'no' : 'non ancora provata'}</b></td></tr>
+      <tr><td>Progetto</td><td><b>${esc(FB.projectId)}</b></td></tr>
+      <tr><td>Nome usato nell'app</td><td><b>${esc(S.me || '-')}</b></td></tr>
+      <tr><td>Lobby che vedo</td><td><b>${Object.keys(S.lobbies).length}</b></td></tr>
+      <tr><td>Premi che vedo</td><td><b>${Object.keys(S.debts).length}</b></td></tr>
+      <tr><td>Partite nello storico</td><td><b>${Object.keys(S.matches).length}</b></td></tr>
+    </tbody></table>
+    <div class="actions"><button class="btn ghost" data-act="diagTest">Fai una prova di scrittura</button></div>
+    ${S.diag ? `<p class="lead"><b>${esc(S.diag)}</b></p>` : '<p class="meta">La prova scrive una riga di controllo e la rilegge: dice se questo account riesce davvero a salvare per tutti.</p>'}
+  </details>
+  <h2>Quote 1X2 per coppia</h2>
+  <p class="lead">Il premio dell'esito 1X2 dipende da chi gioca. L'admin sceglie i due nomi e l'app applica queste quote: 1 è il primo nome, 2 il secondo.</p>
+  <div style="overflow-x:auto"><table><thead><tr><th>Sfida</th><th>1</th><th>X</th><th>2</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="meta">Se i nomi sono invertiti rispetto alla tabella, l'app scambia da sola 1 e 2.</p>
+  ${catalog(demo).map(g => `<h2>${g.cat}</h2><div class="list">${g.items.map(b => `<div class="row">${gauge(b.t || 3)}<div><div class="name">${esc(b.name)}${b.tag?`<span class="tag">${esc(b.tag)}</span>`:''}</div><div class="how">${esc(b.how)}</div></div><div class="prize">${b.t ? TIERS[b.t] : 'secondo la coppia'}</div></div>`).join('')}</div>`).join('')}`;
+}
+
+/* ================= Azioni ================= */
+// La conferma è tenuta nello stato, non nel pulsante: un aggiornamento automatico non la azzera più
+function armed(el, label){
+  const key = el.dataset.act + ':' + (el.dataset.id || '');
+  if(S.armed && S.armed.key === key && Date.now() < S.armed.until){ S.armed = null; return true; }
+  S.armed = {key, label, until: Date.now() + 8000};
+  render();
+  clearTimeout(S._at);
+  S._at = setTimeout(() => { if(S.armed && S.armed.key === key){ S.armed = null; render(); } }, 8000);
+  return false;
+}
+function armLabel(act, id, label){
+  const key = act + ':' + (id || '');
+  return (S.armed && S.armed.key === key && Date.now() < S.armed.until) ? 'Conferma: ' + label.toLowerCase() : label;
+}
+
+async function act(a, el){
+  const id = el.dataset.id;
+  switch(a){
+    case 'login': {
+      const name = $('#lgName').value, pin = $('#lgPin').value.trim(), msg = $('#lgMsg');
+      if(!/^\d{4}$/.test(pin)){ msg.textContent = 'Il PIN deve essere di 4 cifre.'; return; }
+      await loadPlayers();
+      const p = S.players.find(x => x.name === name); if(!p) return;
+      const h = await sha('pin|' + name + '|' + pin);
+      if(p.pin && p.pin !== h){ msg.textContent = 'PIN sbagliato.'; return; }
+      if(!p.pin){ p.pin = h; if(!await sset('players', {list:S.players})) return; }
+      S.me = name; await sset('me', {name}, false);
+      S.intro = !(await sget('onboarded', false, false));
+      await refreshAll(); if(!S.intro) await autoJoin(); break;
+    }
+    case 'addPlayer': {
+      const name = $('#npName').value.trim(), pin = $('#npPin').value.trim(), msg = $('#npMsg');
+      if(!/^[A-Za-zÀ-ÿ0-9]{2,20}$/.test(name)){ msg.textContent = 'Usa solo lettere e numeri, da 2 a 20 caratteri.'; return; }
+      if(!/^\d{4}$/.test(pin)){ msg.textContent = 'Il PIN deve essere di 4 cifre.'; return; }
+      await loadPlayers();
+      if(S.players.some(p => p.name.toLowerCase() === name.toLowerCase())){ msg.textContent = 'Questo nome esiste già: sceglilo dalla lista sopra.'; return; }
+      S.players.push({name, pin: await sha('pin|' + name + '|' + pin)});
+      if(!await sset('players', {list:S.players})) return;
+      S.me = name; await sset('me', {name}, false);
+      S.intro = !(await sget('onboarded', false, false));
+      await refreshAll(); if(!S.intro) await autoJoin(); break;
+    }
+    case 'logout': S.me = null; S.open = null; S.openMatch = null; await sdel('me', false); render(); break;
+    case 'refresh': await refreshAll(); toast('Aggiornato'); break;
+    case 'retryStorage': await retryStorage(false); break;
+
+    case 'createLobby': {
+      const pw = (S.pwDraft.new || '').trim(), msg = $('#newPwMsg');
+      if(pw.length < 4){ msg.textContent = 'Scegli una password di almeno 4 caratteri.'; return; }
+      await loadLobbies();
+      const already = Object.values(S.lobbies).find(l => l.by === S.me);
+      if(already){ toast('Hai già una lobby aperta: ti porto lì.'); await joinLobby(already.id); return; }
+      const lid = uid(), ph = await sha(`lobby|${lid}|${pw}`);
+      const l = {id:lid, code:lid, by:S.me, created:today(), ts:Date.now(), current:null, state:'prep', pw:ph};
+      if(!await sset('l:' + lid, l)) return;
+      await sset('lp:' + lid, ph, false);
+      S.lobbies[lid] = l; S.lobbyOk[lid] = true; delete S.pwDraft.new;
+      await joinLobby(lid); toast('Lobby creata: passa la password agli amici');
+      break;
+    }
+    case 'join': {
+      const l = S.lobbies[id]; if(!l) return;
+      if(l.pw && !S.lobbyOk[id] && l.by !== S.me){
+        const h = await sha(`lobby|${id}|${(S.pwDraft[id] || '').trim()}`);
+        if(h !== l.pw){ const m = $('#pwmsg_' + id); if(m) m.textContent = 'Password sbagliata.'; return; }
+        await sset('lp:' + id, h, false); S.lobbyOk[id] = true; delete S.pwDraft[id];
+      }
+      await joinLobby(id); break;
+    }
+    case 'leave': {
+      const l = S.lobbies[S.open], m = currentMatch(l);
+      const me = (S.users[S.open] || {})[S.me];
+      if(l && me?.role && !(m && m.status === 'scommesse')) await saveMe(l.id, {role:null, roleTs:null});
+      S.open = null; await loadLobbies(); render(); break;
+    }
+    case 'saveNames': {
+      const lid = S.open, l0 = S.lobbies[lid];
+      if(!l0 || l0.by !== S.me) return;
+      const fresh = await sget('l:' + lid); if(!fresh) return;
+      fresh.p1 = (S.nameDraft.p1 ?? fresh.p1 ?? '').trim();
+      fresh.p2 = (S.nameDraft.p2 ?? fresh.p2 ?? '').trim();
+      if(await sset('l:' + lid, fresh)) S.lobbies[lid] = fresh;
+      break;
+    }
+    case 'dismissIntro': {
+      S.intro = false; await sset('onboarded', true, false); render(); break;
+    }
+    case 'takeRole': {
+      const lid = S.open, l = S.lobbies[lid], m = currentMatch(l);
+      if(m && m.status === 'scommesse'){ toast('I posti si cambiano solo tra una partita e l\'altra.'); return; }
+      if(roleMap(lid)[el.dataset.role]){ toast('Questo posto è appena stato preso.'); render(); return; }
+      const me = (S.users[lid] ||= {})[S.me] || {name:S.me, joined:Date.now()};
+      (S.users[lid])[S.me] = {...me, role:el.dataset.role, roleTs:Date.now(), seen:Date.now()};
+      render();
+      await saveMe(lid, {role:el.dataset.role, roleTs:Date.now()});
+      await loadLobby(lid); render(); break;
+    }
+    case 'leaveRole': {
+      const lid = S.open, me = (S.users[lid] || {})[S.me];
+      if(me){ S.users[lid][S.me] = {...me, role:null, roleTs:null}; render(); }
+      await saveMe(lid, {role:null, roleTs:null}); await loadLobby(lid); render(); break;
+    }
+    case 'freeRole': {
+      const lid = S.open, l = S.lobbies[lid];
+      if(!l || l.by !== S.me) return;
+      const k = ukey(lid, el.dataset.name), u = await sget(k);
+      if(u){ u.role = null; u.roleTs = null; await sset(k, u); }
+      await loadLobby(lid); render(); break;
+    }
+    case 'start': await startMatch(id); break;
+    case 'commit': await commit(id); break;
+    case 'result': await setResult(id, el.dataset.key, el.dataset.v); break;
+    case 'close': await closeMatch(id); break;
+    case 'cancelMatch': {
+      if(!armed(el, el.dataset.label)) return;
+      const l = S.lobbies[S.open]; if(!l || l.by !== S.me) return;
+      await sdel('m:' + id); await sdel('s:' + id, false); delete S.matches[id];
+      const fresh = await sget('l:' + l.id);
+      if(fresh){ fresh.current = null; fresh.state = 'prep'; await sset('l:' + l.id, fresh); S.lobbies[l.id] = fresh; }
+      toast('Partita annullata'); await loadLobby(l.id); render(); break;
+    }
+    case 'closeLobby': {
+      if(!armed(el, el.dataset.label)) return;
+      const l = S.lobbies[id]; if(!l || l.by !== S.me) return;
+      const m = currentMatch(l);
+      delete S.lobbies[id]; S.open = null; S.closing = id; render();
+      await sdel('l:' + id);                        // prima tolgo la lobby: nessuno può più entrarci
+      if(m && m.status === 'scommesse'){ await sdel('m:' + m.id); delete S.matches[m.id]; }
+      const uks = (await slist(`u:${id}:`)) || [];
+      await Promise.all(uks.map(k => sdel(k)));
+      S.closing = null;
+      await loadLobbies(); toast('Lobby chiusa'); render(); break;
+    }
+    case 'openMatch': S.openMatch = id; render(); window.scrollTo(0,0); break;
+    case 'backStorico': S.openMatch = null; render(); break;
+    case 'delMatch': {
+      if(!armed(el, el.dataset.label)) return;
+      const m = S.matches[id]; if(!m || m.by !== S.me) return;
+      await loadDebts();
+      const gone = Object.values(S.debts).filter(d => d.mid === id);
+      await Promise.all(gone.map(d => sdel('d:' + d.id)));
+      gone.forEach(d => delete S.debts[d.id]);
+      await sdel('m:' + id); delete S.matches[id]; S.openMatch = null;
+      toast('Partita e premio eliminati'); render(); break;
+    }
+    case 'paid': {
+      const loc = S.debts[id]; if(!loc || loc.a !== S.me) return;
+      S.debts[id] = {...loc, paid: !loc.paid}; render();
+      const d = await sget('d:' + id); if(!d || d.a !== S.me) return;
+      d.paid = !loc.paid; d.paidAt = d.paid ? today() : null;
+      if(await sset('d:' + id, d)) S.debts[id] = d;
+      render(); break;
+    }
+    case 'delDebt': {
+      if(!armed(el, 'Elimina')) return;
+      const d = await sget('d:' + id); if(!d || d.a !== S.me) return;
+      const gone = {...d, removed:true, removedBy:S.me, removedAt:today()};
+      if(await sset('d:' + id, gone)){ delete S.debts[id]; toast('Premio eliminato'); }
+      else toast('Non sono riuscito a eliminarlo: riprova tra poco.');
+      render(); break;
+    }
+    case 'diagTest': {
+      S.diag = 'Prova in corso…'; render();
+      const stamp = Date.now();
+      const okW = await sset('diagtest', {who:S.me || 'senza nome', at:stamp});
+      if(!okW){ S.diag = 'Scrittura non riuscita: questo dispositivo non riesce a scrivere sul database, quindi gli altri non vedranno le tue lobby.'; render(); return; }
+      const back = await sget('diagtest');
+      S.diag = back && back.at === stamp
+        ? 'Tutto a posto: questo account scrive e rilegge i dati condivisi.'
+        : 'Scrittura accettata ma la rilettura non torna: i dati non stanno arrivando al database condiviso.';
+      render(); break;
+    }
+    case 'exportData': {
+      const data = {v:1, exported:new Date().toISOString(), players:S.players, debts:Object.values(S.debts), matches:Object.values(S.matches)};
+      S.ioText = JSON.stringify(data); S.io = true; render();
+      const box = $('#ioBox');
+      if(box){ box.focus(); box.select(); }
+      try{ await navigator.clipboard.writeText(S.ioText); toast('Dati copiati: incollali nell\'altra versione'); }
+      catch(e){ toast('Dati pronti qui sotto: copiali a mano'); }
+      break;
+    }
+    case 'importData': {
+      const msg = $('#ioMsg'), raw = ($('#ioBox')?.value || '').trim();
+      if(!raw){ msg.textContent = 'Incolla prima il testo esportato.'; return; }
+      let data;
+      try{ data = JSON.parse(raw); }catch(e){ msg.textContent = 'Testo non valido: copialo di nuovo per intero.'; return; }
+      if(!data || !Array.isArray(data.debts)){ msg.textContent = 'Questo testo non contiene dati dell\'app.'; return; }
+      msg.textContent = 'Importazione in corso…';
+      let n = 0;
+      for(const d of data.debts){
+        if(!(d && d.id && d.da && d.a && d.t) || d.removed) continue;
+        const here = await sget('d:' + d.id);
+        if(here && here.removed) continue;            // qui era stato eliminato: resta eliminato
+        if(await sset('d:' + d.id, d)) n++;
+      }
+      for(const mm of (data.matches || [])){ if(mm && mm.id && mm.lid) await sset('m:' + mm.id, mm); }
+      if(Array.isArray(data.players)){
+        await loadPlayers();
+        const known = new Set(S.players.map(x => x.name));
+        const add = data.players.filter(x => x && x.name && !known.has(x.name));
+        if(add.length) await sset('players', {list:[...S.players, ...add]});
+      }
+      await loadPlayers(); await loadDebts(); await loadMatches();
+      S.ioText = ''; msg.textContent = '';
+      toast(`Importati ${n} premi`); render(); break;
+    }
+    case 'manualDebt': {
+      const da = $('#mdDa').value, a2 = $('#mdA').value, t = +$('#mdT').value, bet = $('#mdBet').value.trim() || 'Aggiunto a mano', msg = $('#mdMsg');
+      if(da === a2){ msg.textContent = 'Chi paga e chi riceve devono essere due persone diverse.'; return; }
+      const nid = 'man' + uid();
+      const d = {id:nid, date:today(), ts:Date.now(), da, a:a2, t, bet:bet + ` (aggiunto da ${S.me})`, mid:null, paid:false};
+      if(await sset('d:' + nid, d)){ S.debts[nid] = d; toast('Premio aggiunto'); render(); }
+      break;
+    }
+  }
+}
+
+async function autoJoin(){
+  if(S.autoJoined || S.open) return;
+  S.autoJoined = true;
+  const open = Object.values(S.lobbies);
+  const mine = open.find(l => l.by === S.me);
+  if(mine) return joinLobby(mine.id);
+  if(open.length === 1 && (!open[0].pw || S.lobbyOk[open[0].id])) await joinLobby(open[0].id);
+}
+async function joinLobby(lid){
+  S.open = lid; S.openMatch = null; render();
+  await saveMe(lid);
+  await loadLobby(lid); render(); window.scrollTo(0,0);
+}
+
+
+async function startMatch(lid){
+  await loadLobby(lid);
+  const l = S.lobbies[lid];
+  if(!l || l.by !== S.me) return;
+  const cur = currentMatch(l);
+  if(cur && cur.status === 'scommesse') return;
+  const rm = roleMap(lid);
+  if(ROLES.some(([r]) => !rm[r])){ toast('Servono tutti e due gli scommettitori.'); render(); return; }
+  if(!l.p1 || !l.p2 || l.p1 === l.p2){ toast('Scegli prima i due nomi di chi gioca.'); render(); return; }
+  const mid = uid();
+  const m = {id:mid, lid, by:S.me, created:today(), ts:Date.now(), status:'scommesse',
+    p1:l.p1, p2:l.p2, a:rm.a, b:rm.b, results:{}, score:null};
+  if(!await sset('m:' + mid, m)) return;
+  S.matches[mid] = m;
+  l.current = mid; l.state = 'live';
+  if(await sset('l:' + lid, l)){ S.lobbies[lid] = l; toast('Partita iniziata: si scommette'); }
+  await loadLobby(lid); render();
+}
+
+async function commit(mid){
+  const m = S.matches[mid], msg = $('#cmMsg'), d = S.draft[mid] || {};
+  const all = catalog(m).flatMap(g => g.items);
+  const won = wonCids(m.lid, S.me);
+  const build = (cid, pick, subj, note) => {
+    const x = all.find(i => i.cid === cid);
+    if(!x) return {err:'Scegli la scommessa.'};
+    if(won[cid]) return {err:'Hai già vinto questa scommessa stasera: scegline un\'altra.'};
+    const t = x.k === 'quote' ? quoteTier(m, pick) : x.t;
+    if(!t) return {err:'Scegli la tua previsione.'};
+    const sj = (subj || '').trim();
+    if(x.subj && !sj) return {err:'Scrivi il nome del giocatore.'};
+    let p = x.k === 'yes' ? 'Sì' : String(pick || '').trim();
+    if(!p) return {err:'Scegli la tua previsione.'};
+    if(x.k === 'score'){
+      if(!/^\d+\s*-\s*\d+$/.test(p)) return {err:'Scrivi il risultato esatto come 3-2.'};
+      p = p.replace(/\s/g, '');
+    }
+    return {bet:{cid:x.cid, label: x.subj ? `${x.name}: ${sj}` : x.name, t, k:x.k, pick:p, note:(note || '').trim()}};
+  };
+  const r1 = build(d.cid, d.pick, d.subj, d.note);
+  if(r1.err){ msg.textContent = r1.err; return; }
+  const bets = [r1.bet];
+  let prize = [r1.bet.t];
+  if(d.combo){
+    if(d.cid2 === d.cid){ msg.textContent = 'Nella combo servono due scommesse diverse.'; return; }
+    const r2 = build(d.cid2, d.pick2, d.subj2, d.note2);
+    if(r2.err){ msg.textContent = 'Seconda scommessa: ' + r2.err.toLowerCase(); return; }
+    bets.push(r2.bet);
+    prize = comboPrize(r1.bet.t, r2.bet.t);
+  }
+  const mine = await sget(ukey(m.lid, S.me));
+  if(mine?.mid === mid && mine.commit){ toast('Hai già confermato.'); await loadLobby(m.lid); render(); return; }
+  const secret = {bets, prize, salt:randHex(16)};
+  // Prima salvo la scommessa in privato: senza non potrei rivelarla
+  if(!await sset('s:' + mid, secret, false)) return;
+  S.secrets[mid] = secret;
+  await saveMe(m.lid, {mid, commit: await sha(commitString(mid, S.me, secret)), reveal:null});
+  delete S.draft[mid];
+  toast(d.combo ? 'Combo confermata e sigillata' : 'Scommessa confermata e sigillata');
+  await loadLobby(m.lid); render();
+}
+
+async function setResult(mid, key, v){
+  const loc = S.matches[mid];
+  const l = loc && S.lobbies[loc.lid];
+  if(!loc || loc.status !== 'scommesse' || !l || l.by !== S.me) return;
+  S.matches[mid] = {...loc, results:{...(loc.results || {}), [key]:v}};
+  render();
+  const m = await sget('m:' + mid);
+  if(!m || m.status !== 'scommesse') return;
+  m.results = {...(m.results || {}), [key]:v};
+  const sd = S.scoreDraft[mid];
+  if(sd && sd.g1 !== '' && sd.g2 !== '' && sd.g1 != null && sd.g2 != null) m.score = {g1:+sd.g1, g2:+sd.g2};
+  if(await sset('m:' + mid, m)){ S.matches[mid] = m; render(); }
+}
+
+async function closeMatch(mid){
+  const lid = S.matches[mid]?.lid; if(!lid) return;
+  await loadLobby(lid);
+  const l = S.lobbies[lid], m = await sget('m:' + mid);
+  if(!m || m.status !== 'scommesse' || !l || l.by !== S.me) return;
+  const ua = forMatch(S.users[lid]?.[m.a], m), ub = forMatch(S.users[lid]?.[m.b], m);
+  if(!ua?.reveal || !ub?.reveal){ toast('Le scommesse non sono ancora state rivelate.'); return; }
+  const res = m.results || {};
+  if(!res.a || !res.b){ toast('Segna prima l\'esito di entrambe le scommesse.'); render(); return; }
+  const sd = S.scoreDraft[mid] || {}, sc = m.score || {};
+  const g1 = sd.g1 ?? sc.g1, g2 = sd.g2 ?? sc.g2;
+  m.score = (g1 !== '' && g1 != null && g2 !== '' && g2 != null) ? {g1:Math.max(0,+g1), g2:Math.max(0,+g2)} : null;
+  const strip = r => { const n = normRec(r); return {bets:n.bets, prize:n.prize}; };
+  m.picks = {a:strip(ua.reveal), b:strip(ub.reveal)};
+  // Chi indovina riceve dall'altro scommettitore il premio della propria scommessa
+  const writes = [];
+  for(const [key, other] of [['a','b'], ['b','a']]){
+    if(res[key] !== 'won') continue;
+    const r = m.picks[key];
+    r.prize.forEach((t, i) => {
+      const id = `${mid}_${key}${i ? '_' + i : ''}`;
+      writes.push(sset('d:' + id, {id, date:today(), ts:Date.now(), da:m[other], a:m[key], t,
+        bet:`${recLabel(r)}: ${recPick(r)} (${m.p1} contro ${m.p2})`, mid, paid:false}));
+    });
+  }
+  await Promise.all(writes);
+  Object.assign(m, {status:'chiusa', closedAt:today(), closedTs:Date.now(), closedBy:S.me});
+  if(!await sset('m:' + mid, m)) return;
+  S.matches[mid] = m; delete S.scoreDraft[mid];
+  const fresh = await sget('l:' + lid);
+  if(fresh && fresh.current === mid){ fresh.state = 'prep'; await sset('l:' + lid, fresh); S.lobbies[lid] = fresh; }
+  await loadDebts();
+  toast(res.a === 'won' || res.b === 'won' ? 'Partita salvata, premi creati' : 'Partita salvata, nessun premio');
+  await loadLobby(lid); render();
+}
+
+/* ================= Eventi ================= */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if(t && t.tagName !== 'INPUT'){
+    e.preventDefault();
+    t.classList.add('tapped');
+    Promise.resolve(act(t.dataset.act, t)).finally(() => t.classList.remove('tapped'));
+  }
+  const tab = e.target.closest('#tabs button');
+  if(tab){ S.view = tab.dataset.view; S.open = null; S.openMatch = null; render(); refreshView(); }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if(el.dataset.act === 'showPaid'){ S.showPaid = el.checked; render(); return; }
+  const m = S.open ? currentMatch(S.lobbies[S.open]) : null;
+  if(el.dataset.name){ S.nameDraft[el.dataset.name] = el.value; el.blur(); render(); act('saveNames', {dataset:{}}); return; }
+  if(el.dataset.dcombo && m){ const d = (S.draft[m.id] ||= {}); d.combo = el.checked; if(!el.checked) Object.assign(d, {cid2:'', pick2:'', subj2:'', note2:''}); render(); return; }
+  if(el.dataset.dbet && m){
+    const d = (S.draft[m.id] ||= {});
+    if(el.dataset.dbet === '1') Object.assign(d, {cid:el.value, pick:'', subj:'', note:''});
+    else Object.assign(d, {cid2:el.value, pick2:'', subj2:'', note2:''});
+    el.blur(); render(); return;
+  }
+  if(el.dataset.dpick && m){ const d = (S.draft[m.id] ||= {}); d[el.dataset.dpick === '1' ? 'pick' : 'pick2'] = el.value; if(el.tagName === 'SELECT'){ el.blur(); render(); } }
+  flushRender();
+});
+function flushRender(){ if(S.pending) setTimeout(() => { if(S.pending) render(); }, 0); }
+document.addEventListener('blur', e => { if(e.target.tagName === 'SELECT') flushRender(); }, true);
+
+document.addEventListener('input', e => {
+  const el = e.target;
+  if(el.id === 'ioBox'){ S.ioText = el.value; return; }
+  if(el.dataset.pw){ S.pwDraft[el.dataset.pw] = el.value; return; }
+
+  const m = S.open ? currentMatch(S.lobbies[S.open]) : null;
+  if(!m) return;
+  const d = (S.draft[m.id] ||= {});
+  if(el.dataset.dpick) d[el.dataset.dpick === '1' ? 'pick' : 'pick2'] = el.value;
+  if(el.dataset.dsubj) d[el.dataset.dsubj === '1' ? 'subj' : 'subj2'] = el.value;
+  if(el.dataset.dnote) d[el.dataset.dnote === '1' ? 'note' : 'note2'] = el.value;
+  if(el.dataset.score) (S.scoreDraft[m.id] ||= {})[el.dataset.score] = el.value;
+});
+
+async function refreshView(){
+  if(S.view === 'debiti') await loadDebts();
+  else if(S.view === 'partite') await loadLobbies();
+  else await loadMatches();
+  render();
+}
+async function refreshAll(){
+  await loadPlayers(); await loadLobbies(); await loadMatches(); await loadDebts();
+  if(S.open) await loadLobby(S.open);
+  render();
+}
+
+// Dentro la lobby aggiorna ogni 3,5 secondi, altrove ogni 10
+setInterval(async () => {
+  if(!S.me || S.intro || document.hidden || S.busy) return;
+  const now = Date.now();
+  if(!S.open && now - S.lastSlow < 10000) return;
+  S.busy = true;
+  try{
+    if(S.open && S.open !== S.closing){
+      if(now - S.lastBeat > 10000) await saveMe(S.open);
+      await loadLobby(S.open);
+    } else {
+      S.lastSlow = now;
+      if(S.view === 'debiti') await loadDebts();
+      else if(S.view === 'partite') await loadLobbies();
+      else if(S.view === 'storico') await loadMatches();
+    }
+    render();
+  } finally { S.busy = false; }
+}, 3500);
+
+async function probeStorage(){
+  try{
+    const res = await fetch(fbUrl('store/ping'), {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({fields:{k:{stringValue:'ping'}, v:{stringValue: JSON.stringify(Date.now())}}})
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    CANWRITE = true;
+    return true;
+  }catch(e){ console.error('Database non raggiungibile', e); CANWRITE = false; return false; }
+}
+async function retryStorage(silent){
+  if(REMOTE || S.probing) return;
+  S.probing = true;
+  try{
+    if(await probeStorage()){
+      REMOTE = true;
+      Object.assign(S, {me:null, open:null, openMatch:null, lobbies:{}, matches:{}, debts:{}, users:{}, autoJoined:false});
+      await loadPlayers(); await seedDebts();
+      const me = await sget('me', null, false);
+      if(me && S.players.some(p => p.name === me.name && p.pin)) S.me = me.name;
+      if(S.me){ await loadLobbies(); await loadMatches(); await loadDebts(); }
+      render(); toast('Salvataggio collegato' + (S.me ? '' : ': rifai l\'accesso'));
+      if(S.me && !S.intro) await autoJoin();
+    } else if(!silent) toast('Ancora niente: controlla i punti dell\'avviso giallo.');
+  } finally { S.probing = false; }
+}
+setInterval(() => { if(!REMOTE && !document.hidden) retryStorage(true); }, 15000);
+
+(async () => {
+  render();
+  REMOTE = await probeStorage();
+  await loadPlayers();
+  await seedDebts();
+  const me = await sget('me', null, false);
+  if(me && S.players.some(p => p.name === me.name && p.pin)) S.me = me.name;
+  if(S.me){
+    S.intro = !(await sget('onboarded', false, false));
+    await loadLobbies(); await loadMatches(); await loadDebts();
+  }
+  render();
+  if(S.me && !S.intro) await autoJoin();
+})();
+</script>
+</body>
+</html>
