@@ -157,21 +157,23 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 /* ================= Dati fissi ================= */
 const TIERS = {1:'Acqua / caffè',2:'Bibita / amaro / shot',3:'Birra / toast',4:'Panino semplice',5:'Panino / piadina / drink',6:'Menù / drink costoso'};
 const MAXT = 6;
+const PRICES = {1:1, 2:4, 3:6, 4:8, 5:10, 6:12};
+const euro = n => `${n} €`;
 const DEFAULT_PLAYERS = ['Luca','Mario','Gianlu','Simo','Berro'];
 const fl = v => String(v).replace('.',',');
 
 const FIRST_SLOT = ['Luca','Gianlu','Mario','Simo'];
-const SECOND_SLOT = ['Gianlu','Mario','Simo','Berro'];
+const SECOND_SLOT = ['Luca','Gianlu','Mario','Simo','Berro'];
 // Quote 1X2 per coppia: livelli di premio per 1, X e 2
 const QUOTE = [
-  {a:'Luca',b:'Simo',t:[1,3,5]},
+  {a:'Luca',b:'Simo',t:[2,3,5]},
   {a:'Luca',b:'Mario',t:[2,3,5]},
   {a:'Luca',b:'Gianlu',t:[2,3,5]},
   {a:'Luca',b:'Berro',t:[1,5,6]},
   {a:'Mario',b:'Gianlu',t:[3,2,2]},
   {a:'Mario',b:'Berro',t:[1,5,6]},
-  {a:'Mario',b:'Simo',t:[2,2,3]},
-  {a:'Gianlu',b:'Simo',t:[2,3,5]},
+  {a:'Mario',b:'Simo',t:[2,2,2]},
+  {a:'Gianlu',b:'Simo',t:[2,2,3]},
   {a:'Gianlu',b:'Berro',t:[1,5,6]},
   {a:'Simo',b:'Berro',t:[1,5,6]}
 ];
@@ -209,8 +211,9 @@ function catalog(m){
       {cid:'over35',t:3,k:'yes',name:'Over 3,5 gol totali',how:'Almeno 4 gol tra i due.'},
       {cid:'goltot',t:3,k:'num',name:'Numero esatto di gol totali',how:'Somma dei gol dei due giocatori.'},
       {cid:'nogoal',t:4,k:'yes',name:'No goal: almeno uno non segna',how:'Uno dei due chiude senza gol.'},
-      {cid:'gol15',t:4,k:'yes',name:'Gol nei primi 15 minuti',how:'Almeno un gol, di chiunque, nel quarto d\'ora iniziale.'},
-      {cid:'gol10',t:5,k:'yes',name:'Gol nei primi 10 minuti',how:'Almeno un gol, di chiunque, nei primi dieci minuti.'},
+      {cid:'gol15',t:3,k:'yes',name:'Gol nei primi 15 minuti',how:'Almeno un gol, di chiunque, nel quarto d\'ora iniziale.'},
+      {cid:'gol10',t:4,k:'yes',name:'Gol nei primi 10 minuti',how:'Almeno un gol, di chiunque, nei primi dieci minuti.'},
+      {cid:'golnormali',t:4,k:'yes',name:'Over 2,5 gol da tiro normale',how:'Almeno tre gol segnati senza tecnica speciale, di entrambi.'},
       {cid:'nogol1t',t:5,k:'yes',name:'Nessun gol nel primo tempo',how:'Si va al riposo sullo 0-0.'}
     ]},
     {cat:'Marcatori', items:[
@@ -224,11 +227,8 @@ function catalog(m){
     {cat:'Eventi di gioco', items:[
       {cid:'oufalli',t:1,k:'ou',name:'Under/Over 1,5 falli totali',how:'Falli fischiati a entrambi.'},
       {cid:'scontri12',t:1,k:'yes',name:'1 o 2 scontri mirati vinti',how:'In tutta la partita se ne vincono uno o due.'},
-      {cid:'undersenza',t:1,k:'yes',name:'Under 3,5 tiri senza tecnica',how:'Al massimo tre tiri normali in tutta la partita.'},
       {cid:'underport',t:1,k:'yes',name:'Under 1,5 tiri/parate portentose',how:'Al massimo una in tutta la partita.'},
-      {cid:'outiri',t:2,k:'ou',name:'Under/Over 7,5 tiri totali',how:'Tutti i tiri di entrambi, con o senza tecnica.'},
       {cid:'oufuori',t:2,k:'ou',name:'Under/Over 1,5 fuorigioco',how:'Fuorigioco fischiati a entrambi.'},
-      {cid:'oversenza',t:3,k:'yes',name:'Over 3,5 tiri senza tecnica',how:'Almeno quattro tiri normali in tutta la partita.'},
       {cid:'overport',t:3,k:'yes',name:'Over 1,5 tiri/parate portentose',how:'Almeno due in tutta la partita.'},
       {cid:'giallo',t:5,k:'yes',name:'Almeno un cartellino giallo',how:'Si può puntare solo sul sì.'},
       {cid:'scontriex',t:5,k:'num',name:'Numero esatto di scontri mirati vinti',how:'Quanti ne vengono vinti in tutta la partita.'},
@@ -927,18 +927,23 @@ function viewDebiti(){
   const all = Object.values(S.debts).sort((a,b)=>(b.ts||0)-(a.ts||0) || (b.date||'').localeCompare(a.date||''));
   const open = all.filter(d => !d.paid);
   const names = [...new Set([...S.players.map(p=>p.name), ...all.flatMap(d=>[d.da,d.a])])];
-  const rows = names.map(p => { const give = open.filter(d=>d.da===p).reduce((s,d)=>s+d.t,0), get = open.filter(d=>d.a===p).reduce((s,d)=>s+d.t,0); return {p,give,get,net:get-give}; }).sort((a,b)=>b.net-a.net);
+  const rows = names.map(p => {
+    const mine = open.filter(d => d.da === p), theirs = open.filter(d => d.a === p);
+    const give = mine.reduce((s,d) => s + d.t, 0), get = theirs.reduce((s,d) => s + d.t, 0);
+    const giveE = mine.reduce((s,d) => s + (PRICES[d.t] || 0), 0), getE = theirs.reduce((s,d) => s + (PRICES[d.t] || 0), 0);
+    return {p, give, get, net:get - give, netE:getE - giveE};
+  }).sort((a,b) => b.netE - a.netE);
   const list = all.filter(d => S.showPaid || !d.paid);
   const pOpts = S.players.map(p=>`<option>${esc(p.name)}</option>`).join('');
   return `
   <h2>Saldi</h2>
-  <p class="lead">I punti corrispondono al livello del premio, da acqua (1) a drink costoso (5). Contano solo i premi non ancora ricevuti.</p>
-  <table><thead><tr><th>Giocatore</th><th class="num">Deve dare</th><th class="num">Deve ricevere</th><th class="num">Saldo</th></tr></thead><tbody>
-  ${rows.map(r=>`<tr><td>${esc(r.p)}</td><td class="num">${r.give}</td><td class="num">${r.get}</td><td class="num ${r.net>0?'pos':r.net<0?'neg':''}">${r.net>0?'+':''}${r.net}</td></tr>`).join('')}</tbody></table>
+  <p class="lead">I punti corrispondono al livello del premio, da caffè (1) a menù (6). La colonna in euro usa i prezzi del bar: caffè 1, bibita 4, birra 6, panino semplice 8, panino 10, menù 12. Contano solo i premi non ancora ricevuti.</p>
+  <table><thead><tr><th>Giocatore</th><th class="num">Deve dare</th><th class="num">Deve ricevere</th><th class="num">Saldo</th><th class="num">In euro</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>${esc(r.p)}</td><td class="num">${r.give}</td><td class="num">${r.get}</td><td class="num ${r.net>0?'pos':r.net<0?'neg':''}">${r.net>0?'+':''}${r.net}</td><td class="num ${r.netE>0?'pos':r.netE<0?'neg':''}">${r.netE>0?'+':''}${euro(r.netE)}</td></tr>`).join('')}</tbody></table>
   <h2>Premi da pagare</h2>
   <div class="actions" style="margin:0 0 10px"><label class="toggle"><input type="checkbox" data-act="showPaid" ${S.showPaid?'checked':''}> Mostra anche quelli già ricevuti</label><button class="btn ghost small" data-act="refresh">Aggiorna</button></div>
   <div class="list">${list.length ? list.map(d => `<div class="row ${d.paid?'paid':''}">${gauge(d.t)}
-    <div><div class="name">${esc(d.da)} deve a ${esc(d.a)}: ${TIERS[d.t].toLowerCase()}</div><div class="meta">${fmtDate(d.date)}, ${esc(d.bet)}</div></div>
+    <div><div class="name">${esc(d.da)} deve a ${esc(d.a)}: ${TIERS[d.t].toLowerCase()} <span class="meta">(${euro(PRICES[d.t] || 0)})</span></div><div class="meta">${fmtDate(d.date)}, ${esc(d.bet)}</div></div>
     <div class="end">${S.me===d.a ? `<div class="actions" style="margin:0;gap:6px"><button class="btn ${d.paid?'ghost':''} small" data-act="paid" data-id="${d.id}">${d.paid?'Segna da ricevere':'Segna ricevuto'}</button><button class="btn ghost small" data-act="delDebt" data-id="${d.id}">${armLabel('delDebt', d.id, 'Elimina')}</button></div>` : `<span class="meta">${d.paid?'Ricevuto':'Da pagare'}</span>`}</div></div>`).join('') : '<div class="empty">Nessun premio in sospeso.</div>'}</div>
   <p class="meta">Solo chi riceve il premio può segnarlo come ricevuto o eliminarlo.</p>
   <h2>Trasferire i dati da un'altra versione</h2>
